@@ -271,15 +271,11 @@ function sacda_preprocess_menu(array &$variables): void {
 function sacda_preprocess_views_view_fields(array &$variables): void {
   $view = $variables['view'];
   $view_id = $view->id();
-  $theme_path = '/' . \Drupal::theme()->getActiveTheme()->getPath();
 
   // List of views that need image handling
   $image_views = ['top_level_collections', 'solr_search_content'];
 
   if (in_array($view_id, $image_views)) {
-
-
-    $variables['default_collection_image'] = $theme_path . '/static/collections/default.jpg';
 
     // Check multiple possible image field names
     $image_field_names = ['did_image', 'field_image', 'thumbnail', 'field_thumbnail', 'field_representative_image'];

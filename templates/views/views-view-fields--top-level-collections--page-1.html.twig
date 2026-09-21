@@ -6,8 +6,7 @@
  * Renders each collection item with image, orange title bar, and optional description.
  */
 #}
-{% set theme_path = '/' ~ active_theme_path() %}
-{% set default_image = theme_path ~ '/static/collections/default.jpg' %}
+{% import '@sacda/macros/media_placeholder.twig' as ph %}
 
 {# Extract fields #}
 {% set image_field = fields.did_image.content|default(fields.field_image.content|default('')) %}
@@ -26,9 +25,7 @@
    collections with no cover image are only clickable on their title bar.
    aria-hidden/tabindex="-1" so the title link stays the single tab stop. #}
 <div class="collection__item__img aspect-4/3 bg-muted overflow-hidden [&_a]:block [&_a]:w-full [&_a]:h-full [&_img]:w-full [&_img]:h-full [&_img]:object-cover">
-	{% set placeholder_img %}
-		<img src="{{ default_image }}" alt="{{ title_field|striptags|trim }}" class="w-full h-full object-cover">
-	{% endset %}
+	{% set placeholder_img = ph.placeholder('Collection') %}
 	{% if has_image %}
 		{{ image_field|raw }}
 	{% elseif url %}

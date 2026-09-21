@@ -1,0 +1,50 @@
+{#
+/**
+ * @file
+ * Generic thumbnail placeholder for records with no representative image.
+ *
+ * Renders a centred icon chosen from the Islandora model term name plus the
+ * model label, in place of a stock photograph. Keys are the term names in the
+ * `islandora_models` vocabulary; anything unrecognised falls back to a plain
+ * file icon so a newly added model still gets a sane card.
+ */
+#}
+
+{% macro icon(model) %}
+	{%- set m = model|striptags|trim -%}
+	{%- if m == 'Audio' -%}
+		<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+	{%- elseif m == 'Video' -%}
+		<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m10 9 5 3-5 3z" fill="currentColor" stroke="none"/>
+	{%- elseif m == 'Image' -%}
+		<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4.5-4.5L3 21"/>
+	{%- elseif m == 'Collection' -%}
+		<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+	{%- elseif m == 'Digital Document' -%}
+		<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5"/><path d="M8 13h8"/><path d="M8 17h5"/>
+	{%- elseif m == 'Newspaper' -%}
+		<path d="M4 22h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><path d="M18 22V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2Z"/><path d="M6 7h8"/><path d="M6 11h8"/><path d="M6 15h5"/>
+	{%- elseif m == 'Publication Issue' -%}
+		<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3Z"/>
+	{%- elseif m == 'Paged Content' or m == 'Compound Object' -%}
+		<path d="M15 2H9a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5"/><path d="M4 8v12a2 2 0 0 0 2 2h9"/>
+	{%- elseif m == 'Binary' -%}
+		<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5"/><path d="M8 13h2v4H8z"/><path d="M14 13h2v4h-2z"/>
+	{%- else -%}
+		<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5"/>
+	{%- endif -%}
+{% endmacro %}
+
+{#
+ * @param model  Islandora model term name, e.g. "Digital Document".
+ * @param label  Optional override for the caption; defaults to the model name.
+ #}
+{% macro placeholder(model, label) %}
+	{%- import _self as self -%}
+	{%- set name = model|striptags|trim -%}
+	{%- set caption = label|default(name ?: 'Item'|t) -%}
+	<div class="w-full h-full flex flex-col items-center justify-center gap-2 bg-muted text-muted-foreground" aria-label="{{ caption }}">
+		<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ self.icon(name) }}</svg>
+		<span class="text-xs font-medium uppercase tracking-wider">{{ caption }}</span>
+	</div>
+{% endmacro %}

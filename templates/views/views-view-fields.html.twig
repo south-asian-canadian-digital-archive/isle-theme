@@ -6,8 +6,7 @@
  * Shows: image, title, and member_of field.
  */
 #}
-{% set theme_path = '/' ~ active_theme_path() %}
-{% set default_image = default_collection_image|default(theme_path ~ '/static/collections/default.jpg') %}
+{% import '@sacda/macros/media_placeholder.twig' as ph %}
 
 {% set title_field = fields.title.content|default('') %}
 {% set member_of_field = fields.member_of_title.content|default('') %}
@@ -36,29 +35,9 @@
 	</div>
 {% endset %}
 
-{# Media-type placeholder for records that have no representative image.
-   Audio/Video have no did_image, so instead of the generic collection
-   default we show an icon that signifies the media type. #}
-{% set is_audio = 'Audio' in model_string %}
-{% set is_video = 'Video' in model_string %}
-{% set media_placeholder %}
-	{% if is_audio or is_video %}
-		<div class="w-full h-full flex flex-col items-center justify-center gap-2 bg-muted text-muted-foreground" aria-label="{{ (is_audio ? 'Audio' : 'Video')|t }}">
-			{% if is_audio %}
-				<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
-				</svg>
-			{% else %}
-				<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m10 9 5 3-5 3z" fill="currentColor" stroke="none"/>
-				</svg>
-			{% endif %}
-			<span class="text-xs font-medium uppercase tracking-wider">{{ (is_audio ? 'Audio' : 'Video')|t }}</span>
-		</div>
-	{% else %}
-		<img src="{{ default_image }}" alt="{{ 'No image'|t }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
-	{% endif %}
-{% endset %}
+{# Media-type placeholder for records that have no representative image: a
+   generic icon keyed to the Islandora model rather than a stock photo. #}
+{% set media_placeholder = ph.placeholder(model_string) %}
 
 {# The real-image branch arrives already wrapped in Drupal's own <a>; the
    placeholder does not, so it gets one here — otherwise records with no
