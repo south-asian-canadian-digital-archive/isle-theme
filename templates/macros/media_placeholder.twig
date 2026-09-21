@@ -3,8 +3,8 @@
  * @file
  * Generic thumbnail placeholder for records with no representative image.
  *
- * Renders a centred icon chosen from the Islandora model term name plus the
- * model label, in place of a stock photograph. Keys are the term names in the
+ * Renders a centred icon chosen from the Islandora model term name, in place
+ * of a stock photograph. Keys are the term names in the
  * `islandora_models` vocabulary; anything unrecognised falls back to a plain
  * file icon so a newly added model still gets a sane card.
  */
@@ -37,14 +37,13 @@
 
 {#
  * @param model  Islandora model term name, e.g. "Digital Document".
- * @param label  Optional override for the caption; defaults to the model name.
+ * @param label  Optional override for the accessible name; defaults to the model.
  #}
 {% macro placeholder(model, label) %}
 	{%- import _self as self -%}
 	{%- set name = model|striptags|trim -%}
 	{%- set caption = label|default(name ?: 'Item'|t) -%}
-	<div class="w-full h-full flex flex-col items-center justify-center gap-2 bg-muted text-muted-foreground" aria-label="{{ caption }}">
+	<div class="w-full h-full flex items-center justify-center bg-muted text-muted-foreground" aria-label="{{ caption }}">
 		<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ self.icon(name) }}</svg>
-		<span class="text-xs font-medium uppercase tracking-wider">{{ caption }}</span>
 	</div>
 {% endmacro %}
