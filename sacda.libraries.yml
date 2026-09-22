@@ -10,6 +10,7 @@ global:
     dist/media-height.js: {}
     dist/pdf-preview.js: {}
     dist/scroll-indicator.js: {}
+    dist/search-pager-navigation.js: {}
     dist/search.util.js: {}
     dist/team-bio-read-more.js: {}
     dist/team-show-more.js: {}
