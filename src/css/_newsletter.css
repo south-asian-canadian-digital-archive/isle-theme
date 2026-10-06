@@ -5,10 +5,14 @@
 .newsletter__info__content, .newsletter__signup__form { width: 100%; }
 .newsletter__signup__form { margin: 0; }
 .newsletter__signup__form p { color: var(--foreground); text-align: justify; }
-.newsletter__form { position: relative; display: flex; align-items: stretch; gap: 0.5rem; margin-top: 1.5rem; }
-.newsletter__email { min-width: 0; width: 100%; height: 50px; padding: 0 1rem; border: 1px solid var(--foreground); border-radius: 0; background: white; color: var(--foreground); }
-.newsletter__email:focus { outline: 3px solid color-mix(in srgb, var(--primary) 35%, transparent); outline-offset: 1px; border-color: var(--primary); }
-.newsletter__email::placeholder { color: color-mix(in srgb, var(--foreground) 60%, transparent); }
+/* Same joined input + button as the search boxes (macros/search.twig): one
+   1px frame, borderless field, dark button flush against it. */
+.newsletter__form { position: relative; display: flex; align-items: stretch; margin-top: 1.5rem; border: 1px solid var(--foreground); transition: border-color 0.3s ease; }
+.newsletter__form:hover, .newsletter__form:focus-within { border-color: var(--primary); }
+.newsletter__email { flex: 1 1 auto; min-width: 0; width: 100%; height: 50px; padding: 0 1rem; border: 0; border-radius: 0; background: transparent; color: var(--foreground); font-size: 16px; outline: none; }
+.newsletter__email::placeholder { color: var(--muted-foreground); }
+.newsletter__submit { flex: 0 0 auto; padding: 0 24px; border: 0; background: var(--foreground); color: var(--background); font-size: 0.875rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: background-color 0.3s ease, color 0.3s ease; }
+.newsletter__submit:hover, .newsletter__submit:focus-visible { background: var(--primary); color: var(--primary-foreground); outline: none; }
 .newsletter__honeypot { position: absolute; left: -5000px; }
 
 .newsletter-section { width: 100%; margin: 0 auto; padding: 4rem 2rem 8rem; }
@@ -27,8 +31,8 @@
 
 @media (max-width: 639px) {
   .newsletter__info { gap: 2rem; padding: 4rem 1rem 2rem; }
-  .newsletter__form, .newsletter-card { flex-direction: column; }
-  .newsletter__form .btn, .newsletter__item__img { width: 100%; }
+  .newsletter-card { flex-direction: column; }
+  .newsletter__item__img { width: 100%; }
   .newsletter__item__img { margin: 0 0 1rem; }
 }
 

@@ -16,6 +16,16 @@ function sacda_theme_suggestions_page_alter(array &$suggestions, array $variable
   // Path-alias-based suggestions: /about -> page__about, /about/team ->
   // page__about + page__about__team. Lets info pages (About, Contact, Team,
   // Media, Newsletter, Exhibits) get dedicated page templates keyed on alias.
+  // Contact forms live at /contact/{form}, so core's path-based suggestions
+  // hand them page__contact — the hand-built /contact info page — and the
+  // real form renders underneath its card. Fall back to the plain page.
+  if (\Drupal::routeMatch()->getRouteName() === 'entity.contact_form.canonical') {
+    $suggestions = array_values(array_filter(
+      $suggestions,
+      static fn (string $s): bool => !str_starts_with($s, 'page__contact'),
+    ));
+    return;
+  }
   $path = \Drupal::service('path.current')->getPath();
   $alias = \Drupal::service('path_alias.manager')->getAliasByPath($path);
   $parts = array_values(array_filter(explode('/', $alias)));
