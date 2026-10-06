@@ -17,7 +17,8 @@
  * - Everything sits in @layer base, so any component or utility rule
  *   overrides it. Exclusions live in :where() so they add no specificity.
  * - The admin toolbar (Claro-styled, shown to logged-in users) and the
- *   advanced search form (fully styled in _advanced_search.css) are excluded.
+ *   advanced search and citation forms (fully styled in _advanced_search.css /
+ *   _detail.css) are excluded.
  */
 
 @layer base {
@@ -25,11 +26,11 @@
        Layout: form items, labels, descriptions
        --------------------------------------------------------------- */
 
-    :is(.form-item, .form-wrapper:not(details)):where(:not(#toolbar-administration *, .advanced-search-form *, .block-facets *)) {
+    :is(.form-item, .form-wrapper:not(details)):where(:not(#toolbar-administration *, .advanced-search-form *, .citation-select-select-citation *, .block-facets *)) {
         margin-block: 0 1.25rem;
     }
 
-    :is(.form-item > label, .form-item > .form-item__label, fieldset > legend):where(:not(#toolbar-administration *, .advanced-search-form *, .block-facets *)) {
+    :is(.form-item > label, .form-item > .form-item__label, fieldset > legend):where(:not(#toolbar-administration *, .advanced-search-form *, .citation-select-select-citation *, .block-facets *)) {
         display: block;
         margin-bottom: 0.375rem;
         font-family: var(--font-heading);
@@ -71,7 +72,7 @@
         vertical-align: baseline;
     }
 
-    :is(fieldset):where(:not(#toolbar-administration *, .advanced-search-form *, .block-facets *)) {
+    :is(fieldset):where(:not(#toolbar-administration *, .advanced-search-form *, .citation-select-select-citation *, .block-facets *)) {
         margin: 0 0 1.25rem;
         padding: 1rem 1.25rem;
         border: 1px solid var(--border);
@@ -93,7 +94,7 @@
         .form-time,
         .form-textarea,
         .form-select
-    ):where(:not(#toolbar-administration *, .advanced-search-form *)) {
+    ):where(:not(#toolbar-administration *, .advanced-search-form *, .citation-select-select-citation *)) {
         display: block;
         width: 100%;
         max-width: 36rem;
@@ -122,7 +123,7 @@
         resize: vertical;
     }
 
-    :is(.form-select):where(:not(#toolbar-administration *, .advanced-search-form *, .pager__sort *)) {
+    :is(.form-select):where(:not(#toolbar-administration *, .advanced-search-form *, .citation-select-select-citation *, .pager__sort *)) {
         padding-right: 2.5rem;
         cursor: pointer;
         appearance: none;
@@ -145,7 +146,7 @@
         .form-time,
         .form-textarea,
         .form-select
-    ):where(:not(#toolbar-administration *, .advanced-search-form *)):where(:hover, :focus) {
+    ):where(:not(#toolbar-administration *, .advanced-search-form *, .citation-select-select-citation *)):where(:hover, :focus) {
         border-color: var(--primary);
     }
 
@@ -161,7 +162,7 @@
         .form-time,
         .form-textarea,
         .form-select
-    ):where(:not(#toolbar-administration *, .advanced-search-form *)):focus-visible {
+    ):where(:not(#toolbar-administration *, .advanced-search-form *, .citation-select-select-citation *)):focus-visible {
         box-shadow: 0 0 0 1px var(--primary);
     }
 
@@ -237,7 +238,7 @@
        variant, so the primary action always reads first.
        --------------------------------------------------------------- */
 
-    :is(.form-actions):where(:not(#toolbar-administration *, .advanced-search-form *)) {
+    :is(.form-actions):where(:not(#toolbar-administration *, .advanced-search-form *, .citation-select-select-citation *)) {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -245,7 +246,7 @@
         margin-top: 1.75rem;
     }
 
-    :is(.form-submit, .button):where(:not(#toolbar-administration *, .advanced-search-form *, .block-facets *)) {
+    :is(.form-submit, .button):where(:not(#toolbar-administration *, .advanced-search-form *, .citation-select-select-citation *, .block-facets *)) {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -266,12 +267,12 @@
     }
 
     @media (min-width: 768px) {
-        :is(.form-submit, .button):where(:not(#toolbar-administration *, .advanced-search-form *, .block-facets *)) {
+        :is(.form-submit, .button):where(:not(#toolbar-administration *, .advanced-search-form *, .citation-select-select-citation *, .block-facets *)) {
             padding: 0 50px;
         }
     }
 
-    :is(.form-submit, .button):where(:not(#toolbar-administration *, .advanced-search-form *, .block-facets *)):where(:hover, :focus-visible) {
+    :is(.form-submit, .button):where(:not(#toolbar-administration *, .advanced-search-form *, .citation-select-select-citation *, .block-facets *)):where(:hover, :focus-visible) {
         border-color: var(--primary);
         background-color: var(--primary);
         color: var(--primary-foreground);
