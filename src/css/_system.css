@@ -439,5 +439,42 @@ details.js-form-wrapper summary .summary {
 }
 
 .openseadragon-viewer {
+    position: relative;
     height: calc(100vh - var(--header-height, 80px) - 1rem);
+}
+
+/* Overlay added by js/openseadragon-loader.ts; cleared on the first painted tile. */
+.osd-loader {
+    @apply pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 text-sm;
+    color: rgb(255 255 255 / 0.75);
+    transition: opacity 300ms ease;
+}
+
+.osd-loader--done {
+    opacity: 0;
+}
+
+.osd-loader__spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    border: 3px solid rgb(255 255 255 / 0.2);
+    border-top-color: rgb(255 255 255 / 0.85);
+    animation: osd-loader-spin 0.9s linear infinite;
+}
+
+.osd-loader--error .osd-loader__spinner {
+    display: none;
+}
+
+@keyframes osd-loader-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .osd-loader__spinner {
+        animation-duration: 2.5s;
+    }
 }

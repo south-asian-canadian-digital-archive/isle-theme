@@ -8,6 +8,7 @@ global:
     dist/header.js: {}
     dist/language-switcher.js: {}
     dist/media-height.js: {}
+    dist/openseadragon-loader.js: {}
     dist/pdf-preview.js: {}
     dist/scroll-indicator.js: {}
     dist/search-pager-navigation.js: {}
