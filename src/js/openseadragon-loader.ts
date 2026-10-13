@@ -5,12 +5,16 @@
  *
  * Until Cantaloupe answers info.json and the first tile paints, the viewer is
  * just the module's black box. This puts a spinner over it and clears it on
- * the first `tile-drawn`, or swaps in an error message on `open-failed`.
+ * the first `tile-drawn` or `tile-loaded`, or swaps in an error message on
+ * `open-failed`. OpenSeadragon 5+ defaults to the WebGL drawer, which never
+ * raises `tile-drawn` (only the legacy canvas drawer does), so `tile-loaded`
+ * is what actually clears it there; the fade covers the gap until it paints.
  *
  * The contrib module (openseadragon_viewer.js) keeps its OpenSeadragon.Viewer
  * in a local variable, so there's no instance to call addHandler() on. Instead
  * Viewer.prototype.raiseEvent is wrapped: every viewer on the page routes its
  * events through it, including ones constructed before this patch ran.
+ * OpenSeadragon 6 added raiseEventAwaiting, which is wrapped the same way.
  *
  * sacda.libraries.yml declares no dependencies, so OpenSeadragon and core/once
  * may not be loaded yet when this file evaluates — patch from attach(), which
@@ -54,15 +58,20 @@
         const Viewer = window.OpenSeadragon && window.OpenSeadragon.Viewer;
         if (!Viewer || Viewer.prototype.__sacdaLoaderPatched) return !!Viewer;
 
-        const raise = Viewer.prototype.raiseEvent;
-        Viewer.prototype.raiseEvent = function (name, args) {
-            if (name === "tile-drawn") {
-                setState(this.element, "done");
-            } else if (name === "open-failed") {
-                setState(this.element, "error");
-            }
-            return raise.apply(this, arguments);
-        };
+        // OpenSeadragon 6 raises some events (tile-loaded among them) through
+        // raiseEventAwaiting rather than raiseEvent, so wrap both.
+        ["raiseEvent", "raiseEventAwaiting"].forEach((method) => {
+            const raise = Viewer.prototype[method];
+            if (typeof raise !== "function") return;
+            Viewer.prototype[method] = function (name) {
+                if (name === "tile-drawn" || name === "tile-loaded") {
+                    setState(this.element, "done");
+                } else if (name === "open-failed") {
+                    setState(this.element, "error");
+                }
+                return raise.apply(this, arguments);
+            };
+        });
         Viewer.prototype.__sacdaLoaderPatched = true;
         return true;
     }
