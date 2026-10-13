@@ -7,9 +7,9 @@
 /* Lato Light */
 @font-face {
   font-family: 'Lato';
-  src: url('../src/static/fonts/Lato/Lato-Light.woff2') format('woff2'),
-       url('../src/static/fonts/Lato/Lato-Light.woff') format('woff'),
-       url('../src/static/fonts/Lato/Lato-Light.eot') format('embedded-opentype');
+  src: url('../static/fonts/Lato/Lato-Light.woff2') format('woff2'),
+       url('../static/fonts/Lato/Lato-Light.woff') format('woff'),
+       url('../static/fonts/Lato/Lato-Light.eot') format('embedded-opentype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -18,9 +18,9 @@
 /* Lato Light Italic */
 @font-face {
   font-family: 'Lato';
-  src: url('../src/static/fonts/Lato/Lato-LightItalic.woff2') format('woff2'),
-       url('../src/static/fonts/Lato/Lato-LightItalic.woff') format('woff'),
-       url('../src/static/fonts/Lato/Lato-LightItalic.eot') format('embedded-opentype');
+  src: url('../static/fonts/Lato/Lato-LightItalic.woff2') format('woff2'),
+       url('../static/fonts/Lato/Lato-LightItalic.woff') format('woff'),
+       url('../static/fonts/Lato/Lato-LightItalic.eot') format('embedded-opentype');
   font-weight: 300;
   font-style: italic;
   font-display: swap;
@@ -29,9 +29,9 @@
 /* Lato Regular */
 @font-face {
   font-family: 'Lato';
-  src: url('../src/static/fonts/Lato/Lato-Regular.woff2') format('woff2'),
-       url('../src/static/fonts/Lato/Lato-Regular.woff') format('woff'),
-       url('../src/static/fonts/Lato/Lato-Regular.eot') format('embedded-opentype');
+  src: url('../static/fonts/Lato/Lato-Regular.woff2') format('woff2'),
+       url('../static/fonts/Lato/Lato-Regular.woff') format('woff'),
+       url('../static/fonts/Lato/Lato-Regular.eot') format('embedded-opentype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -40,9 +40,9 @@
 /* Lato Italic */
 @font-face {
   font-family: 'Lato';
-  src: url('../src/static/fonts/Lato/Lato-Italic.woff2') format('woff2'),
-       url('../src/static/fonts/Lato/Lato-Italic.woff') format('woff'),
-       url('../src/static/fonts/Lato/Lato-Italic.eot') format('embedded-opentype');
+  src: url('../static/fonts/Lato/Lato-Italic.woff2') format('woff2'),
+       url('../static/fonts/Lato/Lato-Italic.woff') format('woff'),
+       url('../static/fonts/Lato/Lato-Italic.eot') format('embedded-opentype');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
@@ -51,9 +51,9 @@
 /* Lato Bold */
 @font-face {
   font-family: 'Lato';
-  src: url('../src/static/fonts/Lato/Lato-Bold.woff2') format('woff2'),
-       url('../src/static/fonts/Lato/Lato-Bold.woff') format('woff'),
-       url('../src/static/fonts/Lato/Lato-Bold.eot') format('embedded-opentype');
+  src: url('../static/fonts/Lato/Lato-Bold.woff2') format('woff2'),
+       url('../static/fonts/Lato/Lato-Bold.woff') format('woff'),
+       url('../static/fonts/Lato/Lato-Bold.eot') format('embedded-opentype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -62,9 +62,9 @@
 /* Lato Bold Italic */
 @font-face {
   font-family: 'Lato';
-  src: url('../src/static/fonts/Lato/Lato-BoldItalic.woff2') format('woff2'),
-       url('../src/static/fonts/Lato/Lato-BoldItalic.woff') format('woff'),
-       url('../src/static/fonts/Lato/Lato-BoldItalic.eot') format('embedded-opentype');
+  src: url('../static/fonts/Lato/Lato-BoldItalic.woff2') format('woff2'),
+       url('../static/fonts/Lato/Lato-BoldItalic.woff') format('woff'),
+       url('../static/fonts/Lato/Lato-BoldItalic.eot') format('embedded-opentype');
   font-weight: 700;
   font-style: italic;
   font-display: swap;
