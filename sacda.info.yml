@@ -3,7 +3,7 @@ type: theme
 # base theme: olivero
 base theme: false
 description: Theme for sacda.ca frontend
-core_version_requirement: ^10
+core_version_requirement: ^10 || ^11
 libraries:
     - sacda/global
     - core/drupal

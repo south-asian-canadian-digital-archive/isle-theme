@@ -21,6 +21,7 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\media\MediaInterface;
 
 /**
@@ -72,7 +73,7 @@ function sacda_preprocess_media(array &$variables): void {
     ?? $file->getFilename();
 
   $size = _sacda_pdf_field_value($media, 'field_file_size') ?? $file->getSize();
-  $variables['pdf_filesize'] = $size ? format_size((int) $size) : NULL;
+  $variables['pdf_filesize'] = $size ? ByteSizeMarkup::create((int) $size) : NULL;
 
   $variables['pdf_poster_url'] = _sacda_pdf_poster_url($media);
 }
