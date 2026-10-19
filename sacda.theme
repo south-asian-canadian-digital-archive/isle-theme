@@ -83,11 +83,22 @@ function sacda_preprocess_page(array &$variables): void {
   // exposing the private API key used by the retired Pawtucket theme.
   _sacda_preprocess_newsletter($variables, $theme_path);
 
-  // Determine if filters sidebar has actual content
+  // Determine if filters sidebar has actual content.
+  //
+  // The region is rendered exactly once, here, and the template prints that
+  // markup. Rendering a copy to test it and then letting the template render
+  // the region again built every facet block twice; between the two builds the
+  // search view runs and refills the cached facets with unprocessed results,
+  // so the second (visible) render lost every facet link and checkbox.
   $show_filters = FALSE;
   if (!empty($variables['page']['filters'])) {
     $filters_build = $variables['page']['filters'];
-    $rendered_filters = (string) \Drupal::service('renderer')->renderPlain($filters_build);
+    $rendered_filters = (string) \Drupal::service('renderer')->renderInIsolation($filters_build);
+    $variables['page']['filters'] = [
+      '#markup' => \Drupal\Core\Render\Markup::create($rendered_filters),
+      '#attached' => $filters_build['#attached'] ?? [],
+      '#cache' => $filters_build['#cache'] ?? [],
+    ];
 
     // Remove block titles and summaries which often contain text/svgs even when the block content is empty.
     $rendered_no_titles = preg_replace('/<summary\b[^>]*>.*?<\/summary>/is', '', $rendered_filters);
@@ -357,6 +368,17 @@ function sacda_preprocess_region(&$variables) {
     $path = \Drupal::service('path.current')->getPath();
     $alias = \Drupal::service('path_alias.manager')->getAliasByPath($path);
     $variables['self_widthed_content'] = str_starts_with($alias, '/about');
+  }
+
+  // "Clear all" for the facet sidebar: the current page without any facet
+  // filters (f[]) or pager, keeping the search terms.
+  if ($variables['region'] === 'filters') {
+    $variables['#cache']['contexts'][] = 'url.query_args';
+    $query = \Drupal::request()->query->all();
+    if (!empty($query['f'])) {
+      unset($query['f'], $query['page']);
+      $variables['clear_filters_url'] = \Drupal\Core\Url::fromRoute('<current>', [], ['query' => $query])->toString();
+    }
   }
 }
 

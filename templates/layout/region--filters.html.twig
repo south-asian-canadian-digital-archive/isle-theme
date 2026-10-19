@@ -6,6 +6,9 @@
 				<span class="flex items-center text-lg! h-10">Filter Results</span>
 			</button>
 		</h4>
+		{% if clear_filters_url %}
+			<a href="{{ clear_filters_url }}" class="filters-clear">{{ 'Clear all'|t }}</a>
+		{% endif %}
 		<div id="filters-panel-content" class="filters-content">
 			{{ content }}
 		</div>

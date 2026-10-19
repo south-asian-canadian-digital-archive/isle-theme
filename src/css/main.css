@@ -344,6 +344,15 @@
         @apply rotate-180;
     }
 
+    /* "Clear all" link under the heading, shown only while a facet is active. */
+    .result-facets .filters-clear {
+        @apply block px-4 py-2 text-sm text-right text-primary underline underline-offset-2 border-b border-[#e5e5e5] hover:text-foreground;
+    }
+
+    .result-facets.filters--collapsed .filters-clear {
+        @apply hidden;
+    }
+
     .result-facets.filters--collapsed .filters-content {
         display: none;
     }
