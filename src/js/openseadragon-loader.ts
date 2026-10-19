@@ -15,6 +15,8 @@
  * Viewer.prototype.raiseEvent is wrapped: every viewer on the page routes its
  * events through it, including ones constructed before this patch ran.
  * OpenSeadragon 6 added raiseEventAwaiting, which is wrapped the same way.
+ * The same wrapper lets wheel events through to the page when scrollToZoom
+ * is off (see canvas-scroll below).
  *
  * sacda.libraries.yml declares no dependencies, so OpenSeadragon and core/once
  * may not be loaded yet when this file evaluates — patch from attach(), which
@@ -68,6 +70,12 @@
                     setState(this.element, "done");
                 } else if (name === "open-failed") {
                     setState(this.element, "error");
+                } else if (name === "canvas-scroll" && arguments[1]) {
+                    // OpenSeadragon 4+ swallows the wheel event even with
+                    // scrollToZoom off, so the page can't scroll past the
+                    // viewer. Hand it back to the browser in that case.
+                    const gestures = this.gestureSettingsMouse || {};
+                    if (!gestures.scrollToZoom) arguments[1].preventDefault = false;
                 }
                 return raise.apply(this, arguments);
             };

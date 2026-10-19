@@ -14,7 +14,8 @@
 {% set description_field = fields.field_description.content|default('') %}
 
 {# Check if image field has an actual image #}
-{% set image_string = image_field|render|raw %}
+{# Twig 3.30 no longer casts Markup for 'in'; force a string. #}
+{% set image_string = image_field|render ~ '' %}
 {% set has_image = '<img' in image_string %}
 
 {# Resolved in sacda_preprocess_views_view_fields(). #}
