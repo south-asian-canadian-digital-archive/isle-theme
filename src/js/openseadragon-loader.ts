@@ -16,7 +16,7 @@
  * events through it, including ones constructed before this patch ran.
  * OpenSeadragon 6 added raiseEventAwaiting, which is wrapped the same way.
  * The same wrapper lets wheel events through to the page when scrollToZoom
- * is off (see canvas-scroll below).
+ * is off, and zooms on Ctrl/Cmd+wheel instead (see canvas-scroll below).
  *
  * sacda.libraries.yml declares no dependencies, so OpenSeadragon and core/once
  * may not be loaded yet when this file evaluates — patch from attach(), which
@@ -25,6 +25,8 @@
 
 ((Drupal) => {
     const LOADER_CLASS = "osd-loader";
+    // Zoom per 100px of wheel delta (one mouse-wheel notch) for Ctrl/Cmd+wheel.
+    const ZOOM_PER_WHEEL_STEP = 1.2;
 
     function pick(selector, context) {
         if (window.once) {
@@ -75,7 +77,19 @@
                     // scrollToZoom off, so the page can't scroll past the
                     // viewer. Hand it back to the browser in that case.
                     const gestures = this.gestureSettingsMouse || {};
-                    if (!gestures.scrollToZoom) arguments[1].preventDefault = false;
+                    if (!gestures.scrollToZoom) {
+                        const args = arguments[1];
+                        const wheel = args.originalEvent;
+                        // Ctrl (or Cmd on a Mac) + wheel zooms instead. A
+                        // trackpad pinch also arrives as a ctrlKey wheel event.
+                        if (wheel && (wheel.ctrlKey || wheel.metaKey) && this.viewport) {
+                            const factor = Math.pow(ZOOM_PER_WHEEL_STEP, -wheel.deltaY / 100);
+                            this.viewport.zoomBy(factor, this.viewport.pointFromPixel(args.position, true));
+                            this.viewport.applyConstraints();
+                        } else {
+                            args.preventDefault = false;
+                        }
+                    }
                 }
                 return raise.apply(this, arguments);
             };
