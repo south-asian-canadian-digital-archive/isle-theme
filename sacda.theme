@@ -20,6 +20,8 @@ require_once __DIR__ . '/includes/suggestions.inc';
 require_once __DIR__ . '/includes/team.inc';
 require_once __DIR__ . '/includes/info_pages.inc';
 require_once __DIR__ . '/includes/pdf_preview.inc';
+require_once __DIR__ . '/includes/media_download.inc';
+require_once __DIR__ . '/includes/animated_gif.inc';
 
 /**
  * Implements hook_form_system_theme_settings_alter().
@@ -461,4 +463,11 @@ function sacda_preprocess_mirador(array &$variables): void {
       'layers' => FALSE,
     ],
   ];
+
+  // Page thumbnails as a vertical strip on the right rather than a band
+  // under the image, which ate a large share of the viewer's height. The
+  // module pins far-bottom on each window, so override it there.
+  foreach ($viewer['windows'] ?? [] as $i => $window) {
+    $viewer['windows'][$i]['thumbnailNavigationPosition'] = 'far-right';
+  }
 }

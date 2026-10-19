@@ -1,0 +1,24 @@
+{{ title_prefix }}
+{{ title_suffix }}
+
+{#
+  Download card for the `source` media view mode, used for models with no
+  viewer (Binary). Variables come from includes/media_download.inc; without a
+  file it falls back to the display's own markup.
+#}
+{% if download_url %}
+	<div class="media-download h-auto!">
+		<svg class="media-download__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+			<path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+		</svg>
+		<div class="media-download__name">{{ download_filename }}</div>
+		<div class="media-download__meta">
+			{{- download_mime -}}
+			{%- if download_size %} · {{ download_size }}{% endif -%}
+		</div>
+		<a href="{{ download_url }}" class="btn btn-primary" download>{{ 'Download'|t }}</a>
+	</div>
+{% else %}
+	{{ content }}
+{% endif %}

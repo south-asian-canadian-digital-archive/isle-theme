@@ -28,6 +28,14 @@ use Drupal\media\MediaInterface;
  * Implements hook_preprocess_HOOK() for media.
  */
 function sacda_preprocess_media(array &$variables): void {
+  if (($variables['elements']['#view_mode'] ?? NULL) === 'source') {
+    _sacda_media_download_variables($variables);
+    return;
+  }
+  if (($variables['elements']['#view_mode'] ?? NULL) === 'open_seadragon') {
+    _sacda_animated_gif_variables($variables);
+    return;
+  }
   if (($variables['elements']['#view_mode'] ?? NULL) !== 'pdfjs') {
     return;
   }
