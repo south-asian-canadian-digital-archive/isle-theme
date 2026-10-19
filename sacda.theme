@@ -446,7 +446,7 @@ function sacda_preprocess_mirador(array &$variables): void {
   ];
 
   // Simplify the window chrome. The top bar is hidden in css/_mirador.css;
-  // the sidebar is opened from js/mirador-sidebar.ts instead.
+  // the sidebar is opened from js/mirador-controls.ts instead.
   $viewer['window'] = ($viewer['window'] ?? []) + [
     'allowClose' => FALSE,
     'allowMaximize' => FALSE,

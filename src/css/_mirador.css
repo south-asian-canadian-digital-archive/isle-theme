@@ -60,35 +60,40 @@
 }
 
 /* No window top bar: the title repeats the page heading below, and the
-   sidebar toggle is replaced by .mirador-sidebar-toggle. Mirador has no option
+   sidebar and image-tools toggles are replaced by .mirador-controls. Mirador has no option
    to drop the bar itself. */
 .media-content-wrapper .mirador-window > nav:has(> .mirador-window-top-bar) {
     display: none;
 }
 
-/* Sidebar toggle from js/mirador-sidebar.ts, over the top-left of the image.
-   It sits beside the mount, in .content, which is the block's height. */
+/* Sidebar and image-tools buttons from js/mirador-controls.ts, over the
+   top-left of the image. They sit beside the mount, in .content, which is the
+   block's height. */
 .media-content-wrapper .block-mirador .content {
     position: relative;
 }
 
-.mirador-sidebar-toggle {
-    @apply absolute top-3 left-3 z-10 flex h-9 w-9 items-center justify-center rounded-full;
+.mirador-controls {
+    @apply absolute top-3 left-3 z-10 flex flex-col gap-2;
+}
+
+.mirador-controls--sidebar-open {
+    @apply top-auto bottom-3 left-1;
+}
+
+.mirador-controls__button {
+    @apply flex h-9 w-9 items-center justify-center rounded-full;
     color: rgb(255 255 255 / 0.9);
     background: rgb(0 0 0 / 0.55);
     transition: background 150ms ease;
 }
 
-.mirador-sidebar-toggle:hover,
-.mirador-sidebar-toggle:focus-visible {
+.mirador-controls__button:hover,
+.mirador-controls__button:focus-visible {
     background: rgb(0 0 0 / 0.75);
 }
 
-.mirador-sidebar-toggle--open {
-    @apply top-auto bottom-3 left-1;
-}
-
-.mirador-sidebar-toggle svg {
+.mirador-controls__button svg {
     width: 1.1rem;
     height: 1.1rem;
 }
