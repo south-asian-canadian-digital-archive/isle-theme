@@ -57,17 +57,6 @@
     object-fit: contain;
 }
 
-/* ---- Animated GIF (open_seadragon view mode, GIF original) ------------ */
-.media-gif {
-    @apply flex w-full items-center justify-center bg-black;
-    height: calc(100vh - var(--header-height, 80px) - 1rem);
-}
-
-.media-gif img {
-    @apply max-h-full max-w-full;
-    object-fit: contain;
-}
-
 /* ---- Download card (source view mode, models with no viewer) ---------- */
 .media-download {
     @apply flex w-full flex-col items-center justify-center gap-2 bg-muted px-4 py-12 text-center;

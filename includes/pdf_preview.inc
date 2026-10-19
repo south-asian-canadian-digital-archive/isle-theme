@@ -32,7 +32,7 @@ function sacda_preprocess_media(array &$variables): void {
     _sacda_media_download_variables($variables);
     return;
   }
-  if (($variables['elements']['#view_mode'] ?? NULL) === 'open_seadragon') {
+  if (($variables['elements']['#view_mode'] ?? NULL) === 'video') {
     _sacda_animated_gif_variables($variables);
     return;
   }

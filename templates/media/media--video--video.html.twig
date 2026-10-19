@@ -5,11 +5,19 @@
  *
  * Same full-height stage as the audio viewer, letterboxed on a dark
  * background with the video contained (never cropped). Rendered for the
- * `video` view mode placed by the video viewer block.
+ * `video` view mode placed by the video viewer block. An MP4 made from an
+ * animated GIF (includes/animated_gif.inc) plays like the GIF: looped, muted,
+ * no controls.
  */
 #}
 <div{{ attributes.addClass('media-viewer', 'media-viewer--video') }}>
 	<div class="media-viewer__body">
-		<div class="media-viewer__player">{{ content.field_media_video_file.0 }}</div>
+		<div class="media-viewer__player">
+			{% if animated_gif_url %}
+				<video src="{{ animated_gif_url }}" autoplay loop muted playsinline aria-label="{{ animated_gif_label }}"></video>
+			{% else %}
+				{{ content.field_media_video_file.0 }}
+			{% endif %}
+		</div>
 	</div>
 </div>
