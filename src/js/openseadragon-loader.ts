@@ -106,11 +106,17 @@
     // on the main thread; trackpads fire dozens of these a second. Stop plain
     // wheels in the capture phase, before they reach it, and let the page
     // scroll. Ctrl/Cmd wheels carry on to OpenSeadragon for zooming.
-    function passWheelToPage(el) {
+    //
+    // Mirador embeds its own OpenSeadragon, which zooms on any wheel. Its
+    // mount gets the same listener, limited to the image canvas (`only`) so
+    // the thumbnail strip still scrolls; Ctrl/Cmd wheels reach Mirador's own
+    // scroll-to-zoom.
+    function passWheelToPage(el, only) {
         el.addEventListener(
             "wheel",
             (event) => {
                 if (event.ctrlKey || event.metaKey) return;
+                if (only && !(event.target instanceof Element && event.target.closest(only))) return;
                 event.stopPropagation();
                 showZoomHint(el);
             },
@@ -155,6 +161,12 @@
     Drupal.behaviors.sacdaOpenSeadragonLoader = {
         attach: (context) => {
             const root = context instanceof Element ? context : document;
+
+            const mirador = window.once
+                ? window.once("sacdaMiradorWheel", ".block-mirador [id^='mirador-']", root)
+                : [];
+            mirador.forEach((el) => passWheelToPage(el, ".mirador-primary-window"));
+
             const viewers = pick(".openseadragon-viewer", root);
             if (!viewers.length) return;
 
