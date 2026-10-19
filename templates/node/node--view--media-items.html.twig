@@ -39,6 +39,7 @@
 		'document': m.field_media_document,
 		'video': m.field_media_video_file,
 		'audio': m.field_media_audio_file,
+		'image': m.field_media_image,
 	}[media_bundle] : null %}
 	{% set file_uri = src and not src.isEmpty() and src.entity ? src.entity.uri.value : null %}
 
@@ -50,6 +51,8 @@
 			<video src="{{ file_url(file_uri) }}" controls preload="metadata"></video>
 		{% elseif file_uri and media_bundle == 'audio' %}
 			<audio src="{{ file_url(file_uri) }}" controls preload="metadata"></audio>
+		{% elseif file_uri and media_bundle == 'image' %}
+			<img src="{{ file_url(file_uri) }}" alt="{{ src.alt|default(node.label) }}" loading="lazy">
 		{% endif %}
 
 		{% if file_uri %}
