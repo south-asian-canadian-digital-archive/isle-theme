@@ -60,40 +60,49 @@
 }
 
 /* No window top bar: the title repeats the page heading below, and the
-   sidebar and image-tools toggles are replaced by .mirador-controls. Mirador has no option
+   sidebar toggle is replaced by .mirador-sidebar-toggle. Mirador has no option
    to drop the bar itself. */
 .media-content-wrapper .mirador-window > nav:has(> .mirador-window-top-bar) {
     display: none;
 }
 
-/* Sidebar and image-tools buttons from js/mirador-controls.ts, over the
-   top-left of the image. They sit beside the mount, in .content, which is the
-   block's height. */
+/* Sidebar toggle from js/mirador-controls.ts, over the top-left of the image.
+   Styled like the image-tools bar (translucent white, 54% black icons). It
+   sits beside the mount, in .content, which is the block's height. */
 .media-content-wrapper .block-mirador .content {
     position: relative;
 }
 
-.mirador-controls {
-    @apply absolute top-3 left-3 z-10 flex flex-col gap-2;
-}
-
-.mirador-controls--sidebar-open {
-    @apply top-auto bottom-3 left-1;
-}
-
-.mirador-controls__button {
-    @apply flex h-9 w-9 items-center justify-center rounded-full;
-    color: rgb(255 255 255 / 0.9);
-    background: rgb(0 0 0 / 0.55);
+.mirador-sidebar-toggle {
+    @apply absolute top-2 left-2 z-10 flex items-center justify-center rounded-full;
+    /* px, not rem: Mirador's own controls are sized in px, and the site's
+       root font size would make this larger than the toolbar beside it. */
+    width: 57px;
+    height: 57px;
+    color: rgb(0 0 0 / 0.54);
+    background: rgb(255 255 255 / 0.8);
     transition: background 150ms ease;
 }
 
-.mirador-controls__button:hover,
-.mirador-controls__button:focus-visible {
-    background: rgb(0 0 0 / 0.75);
+.mirador-sidebar-toggle:hover,
+.mirador-sidebar-toggle:focus-visible {
+    background: rgb(255 255 255 / 0.95);
 }
 
-.mirador-controls__button svg {
-    width: 1.1rem;
-    height: 1.1rem;
+.mirador-sidebar-toggle svg {
+    width: 26px;
+    height: 26px;
+}
+
+/* Open: at the bottom of the sidebar's icon rail, sized to fit it. */
+.mirador-sidebar-toggle--open {
+    @apply top-auto bottom-2;
+    left: 2px;
+    width: 40px;
+    height: 40px;
+}
+
+.mirador-sidebar-toggle--open svg {
+    width: 22px;
+    height: 22px;
 }
