@@ -15,8 +15,8 @@
  * Viewer.prototype.raiseEvent is wrapped: every viewer on the page routes its
  * events through it, including ones constructed before this patch ran.
  * OpenSeadragon 6 added raiseEventAwaiting, which is wrapped the same way.
- * The same wrapper lets wheel events through to the page when scrollToZoom
- * is off, and zooms on Ctrl/Cmd+wheel instead (see canvas-scroll below).
+ * Plain wheel scrolls the page past the viewer (passWheelToPage); Ctrl/Cmd +
+ * wheel zooms through the same wrapper (see canvas-scroll below).
  *
  * sacda.libraries.yml declares no dependencies, so OpenSeadragon and core/once
  * may not be loaded yet when this file evaluates — patch from attach(), which
@@ -101,6 +101,23 @@
         hint.timer = setTimeout(check, HINT_HIDE_AFTER);
     }
 
+    // OpenSeadragon binds a non-passive wheel listener, so the browser holds
+    // every page scroll over the viewer until OpenSeadragon's handler has run
+    // on the main thread; trackpads fire dozens of these a second. Stop plain
+    // wheels in the capture phase, before they reach it, and let the page
+    // scroll. Ctrl/Cmd wheels carry on to OpenSeadragon for zooming.
+    function passWheelToPage(el) {
+        el.addEventListener(
+            "wheel",
+            (event) => {
+                if (event.ctrlKey || event.metaKey) return;
+                event.stopPropagation();
+                showZoomHint(el);
+            },
+            { capture: true, passive: true },
+        );
+    }
+
     function patchViewer() {
         const Viewer = window.OpenSeadragon && window.OpenSeadragon.Viewer;
         if (!Viewer || Viewer.prototype.__sacdaLoaderPatched) return !!Viewer;
@@ -116,23 +133,16 @@
                 } else if (name === "open-failed") {
                     setState(this.element, "error");
                 } else if (name === "canvas-scroll" && arguments[1]) {
-                    // OpenSeadragon 4+ swallows the wheel event even with
-                    // scrollToZoom off, so the page can't scroll past the
-                    // viewer. Hand it back to the browser in that case.
+                    // Plain wheels never get here (see passWheelToPage), so
+                    // this is Ctrl/Cmd + wheel, or a trackpad pinch, which
+                    // also arrives as a ctrlKey wheel event: zoom.
                     const gestures = this.gestureSettingsMouse || {};
-                    if (!gestures.scrollToZoom) {
-                        const args = arguments[1];
-                        const wheel = args.originalEvent;
-                        // Ctrl (or Cmd on a Mac) + wheel zooms instead. A
-                        // trackpad pinch also arrives as a ctrlKey wheel event.
-                        if (wheel && (wheel.ctrlKey || wheel.metaKey) && this.viewport) {
-                            const factor = Math.pow(ZOOM_PER_WHEEL_STEP, -wheel.deltaY / 100);
-                            this.viewport.zoomBy(factor, this.viewport.pointFromPixel(args.position, true));
-                            this.viewport.applyConstraints();
-                        } else {
-                            args.preventDefault = false;
-                            showZoomHint(this.element);
-                        }
+                    const args = arguments[1];
+                    const wheel = args.originalEvent;
+                    if (!gestures.scrollToZoom && wheel && this.viewport) {
+                        const factor = Math.pow(ZOOM_PER_WHEEL_STEP, -wheel.deltaY / 100);
+                        this.viewport.zoomBy(factor, this.viewport.pointFromPixel(args.position, true));
+                        this.viewport.applyConstraints();
                     }
                 }
                 return raise.apply(this, arguments);
@@ -160,6 +170,7 @@
                 loader.querySelector(`.${LOADER_CLASS}__label`).textContent =
                     Drupal.t("Loading image…");
                 el.appendChild(loader);
+                passWheelToPage(el);
 
                 // The CDN script never arrived, so nothing will ever draw.
                 if (!ok) setState(el, "error");

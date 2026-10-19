@@ -70,14 +70,6 @@ gsap.registerPlugin(ScrollTrigger);
             );
             const loginRegion = document.getElementById("sacda-login-region");
 
-            const updateHeaderHeight = () => {
-                const height = header.offsetHeight;
-                document.documentElement.style.setProperty(
-                    "--header-height",
-                    `${height}px`,
-                );
-            };
-
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: "body",
@@ -87,7 +79,10 @@ gsap.registerPlugin(ScrollTrigger);
                     fastScrollEnd: true,
                     preventOverlaps: true,
                     // markers: true, // Uncomment for debug markers
-                    onUpdate: updateHeaderHeight,
+                    // No --header-height update here: the viewers size off it,
+                    // and resizing them on every scroll frame made
+                    // OpenSeadragon redraw the whole image each frame.
+                    // media-height.ts sets it on load and resize.
                 },
             });
 
