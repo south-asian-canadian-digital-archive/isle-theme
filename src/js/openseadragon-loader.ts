@@ -63,23 +63,42 @@
         (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "",
     );
 
+    const HINT_HIDE_AFTER = 1500;
+    const hints = new WeakMap();
+
     // Plain wheel over the viewer scrolls the page, so say how to zoom instead.
-    // Shown while the wheel keeps moving, faded out shortly after it stops.
+    // Wheel events fire dozens of times a second: after the pill is shown they
+    // only push its hide deadline back, and the DOM is touched once to show it
+    // and once to hide it.
     function showZoomHint(el) {
         if (!el) return;
-        let hint = el.querySelector(`:scope > .${HINT_CLASS}`);
+        let hint = hints.get(el);
         if (!hint) {
-            hint = document.createElement("div");
-            hint.className = HINT_CLASS;
-            hint.setAttribute("aria-hidden", "true");
-            hint.textContent = IS_MAC
+            const node = document.createElement("div");
+            node.className = HINT_CLASS;
+            node.setAttribute("aria-hidden", "true");
+            node.textContent = IS_MAC
                 ? Drupal.t("Hold ⌘ and scroll to zoom")
                 : Drupal.t("Hold Ctrl and scroll to zoom");
-            el.appendChild(hint);
+            el.appendChild(node);
+            hint = { node, hideAt: 0, timer: 0 };
+            hints.set(el, hint);
         }
-        hint.classList.add(`${HINT_CLASS}--visible`);
-        clearTimeout(hint.__sacdaTimer);
-        hint.__sacdaTimer = setTimeout(() => hint.classList.remove(`${HINT_CLASS}--visible`), 1200);
+
+        hint.hideAt = Date.now() + HINT_HIDE_AFTER;
+        if (hint.timer) return;
+
+        hint.node.classList.add(`${HINT_CLASS}--visible`);
+        const check = () => {
+            const left = hint.hideAt - Date.now();
+            if (left > 0) {
+                hint.timer = setTimeout(check, left);
+                return;
+            }
+            hint.timer = 0;
+            hint.node.classList.remove(`${HINT_CLASS}--visible`);
+        };
+        hint.timer = setTimeout(check, HINT_HIDE_AFTER);
     }
 
     function patchViewer() {
