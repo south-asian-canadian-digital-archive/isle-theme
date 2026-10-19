@@ -445,13 +445,14 @@ function sacda_preprocess_mirador(array &$variables): void {
     'allowNewWindows' => FALSE,
   ];
 
-  // Simplify the window chrome. Keep fullscreen + the sidebar (page index and
-  // OCR search are genuinely useful), drop the parts this site has no use for.
+  // Simplify the window chrome. The top bar is hidden in css/_mirador.css,
+  // so the sidebar (opened from it) goes too; pages are browsed from the
+  // thumbnail strip and the canvas arrows.
   $viewer['window'] = ($viewer['window'] ?? []) + [
     'allowClose' => FALSE,
     'allowMaximize' => FALSE,
     'allowTopMenuButton' => FALSE,
-    'allowWindowSideBar' => TRUE,
+    'allowWindowSideBar' => FALSE,
     'sideBarOpenByDefault' => FALSE,
     'defaultSideBarPanel' => 'info',
     'panels' => [

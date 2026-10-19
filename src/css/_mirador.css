@@ -58,3 +58,10 @@
 .media-content-wrapper .block-mirador > .content {
     border: 0;
 }
+
+/* No window top bar: the title repeats the page heading below, and with the
+   sidebar off (sacda_preprocess_mirador) its buttons have nothing to open.
+   Mirador has no option to drop the bar itself. */
+.media-content-wrapper .mirador-window > nav:has(> .mirador-window-top-bar) {
+    display: none;
+}
