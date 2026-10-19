@@ -27,6 +27,7 @@
     const LOADER_CLASS = "osd-loader";
     // Zoom per 100px of wheel delta (one mouse-wheel notch) for Ctrl/Cmd+wheel.
     const ZOOM_PER_WHEEL_STEP = 1.2;
+    const HINT_CLASS = "osd-zoom-hint";
 
     function pick(selector, context) {
         if (window.once) {
@@ -56,6 +57,29 @@
             loader.querySelector(`.${LOADER_CLASS}__label`).textContent =
                 Drupal.t("This image could not be loaded.");
         }
+    }
+
+    const IS_MAC = /mac|iphone|ipad/i.test(
+        (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "",
+    );
+
+    // Plain wheel over the viewer scrolls the page, so say how to zoom instead.
+    // Shown while the wheel keeps moving, faded out shortly after it stops.
+    function showZoomHint(el) {
+        if (!el) return;
+        let hint = el.querySelector(`:scope > .${HINT_CLASS}`);
+        if (!hint) {
+            hint = document.createElement("div");
+            hint.className = HINT_CLASS;
+            hint.setAttribute("aria-hidden", "true");
+            hint.textContent = IS_MAC
+                ? Drupal.t("Hold ⌘ and scroll to zoom")
+                : Drupal.t("Hold Ctrl and scroll to zoom");
+            el.appendChild(hint);
+        }
+        hint.classList.add(`${HINT_CLASS}--visible`);
+        clearTimeout(hint.__sacdaTimer);
+        hint.__sacdaTimer = setTimeout(() => hint.classList.remove(`${HINT_CLASS}--visible`), 1200);
     }
 
     function patchViewer() {
@@ -88,6 +112,7 @@
                             this.viewport.applyConstraints();
                         } else {
                             args.preventDefault = false;
+                            showZoomHint(this.element);
                         }
                     }
                 }

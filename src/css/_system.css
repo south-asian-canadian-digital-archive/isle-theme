@@ -467,6 +467,20 @@ details.js-form-wrapper summary .summary {
     display: none;
 }
 
+/* "Hold Ctrl/⌘ to zoom", flashed by js/openseadragon-loader.ts on plain wheel. */
+.osd-zoom-hint {
+    @apply pointer-events-none absolute inset-0 z-10 flex items-center justify-center text-xl font-semibold;
+    color: rgb(255 255 255 / 0.95);
+    background: rgb(0 0 0 / 0.6);
+    text-shadow: 0 1px 3px rgb(0 0 0 / 0.6);
+    opacity: 0;
+    transition: opacity 250ms ease;
+}
+
+.osd-zoom-hint--visible {
+    opacity: 1;
+}
+
 @keyframes osd-loader-spin {
     to {
         transform: rotate(360deg);
