@@ -11,6 +11,7 @@ global:
     dist/mirador-controls.js: {}
     dist/openseadragon-loader.js: {}
     dist/pdf-preview.js: {}
+    dist/results-display.js: {}
     dist/scroll-indicator.js: {}
     dist/search-pager-navigation.js: {}
     dist/search.util.js: {}

@@ -723,3 +723,23 @@ div.views-element-container > div.view-list {
 .language-switcher-dropdown ul.links a.is-active {
     @apply bg-primary/10 text-primary font-medium;
 }
+
+/* Shared grid and list layouts for result cards. */
+.results-cards--grid {
+    @apply grid gap-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3;
+}
+.results-cards--list {
+    @apply grid grid-cols-1 gap-5;
+}
+.results-cards--list .results-card {
+    @apply flex gap-4 items-start;
+}
+.results-cards--list .results-card__image {
+    @apply w-1/3 sm:w-1/4 shrink-0;
+}
+.results-cards--list .results-card__info {
+    @apply flex-1 min-w-0;
+}
+[data-results-display-controls][hidden] {
+    display: none;
+}

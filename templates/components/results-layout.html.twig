@@ -1,0 +1,13 @@
+{# Shared layout for result pages and their optional filter sidebar. #}
+<main role="main" class="flex flex-col gap-8 my-8">
+	{% if page.content or show_filters_sidebar %}
+		<section class="content-children-layout max-w-5xl mx-auto {% if not compact_results_padding %}px-4 md:px-16{% endif %} w-full">
+			{% if show_filters_sidebar %}
+				<aside class="filters-sidebar">{{ page.filters }}</aside>
+			{% endif %}
+			<div class="{% if show_filters_sidebar %}content-children{% else %}w-full{% endif %}">
+				{{ page.content }}
+			</div>
+		</section>
+	{% endif %}
+</main>

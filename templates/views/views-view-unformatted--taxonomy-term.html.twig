@@ -1,0 +1,9 @@
+{# The controls and card layout can also be used by other result views. #}
+<div data-results-display-wrapper>
+	{% include '@sacda/components/results-display-toggle.html.twig' %}
+	<div{{ attributes.addClass('results-cards', 'results-cards--grid') }} data-results-cards>
+		{% for row in rows %}
+			<div{{ row.attributes.addClass('bg-background', 'overflow-hidden') }}>{{ row.content }}</div>
+		{% endfor %}
+	</div>
+</div>

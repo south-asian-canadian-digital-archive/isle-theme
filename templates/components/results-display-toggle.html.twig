@@ -1,0 +1,6 @@
+{# Reusable display controls for a client-side results list. #}
+<div class="pager__group mb-6" data-results-display-controls hidden role="group" aria-label="{{ 'Results display'|t }}">
+	<h3 class="mr-4">{{ 'Display'|t }}</h3>
+	<button type="button" class="pager__display pager__link--is-active" data-results-display="grid" aria-pressed="true"><i class="fa fa-th" aria-hidden="true"></i>{{ 'Grid'|t }}</button>
+	<button type="button" class="pager__display" data-results-display="list" aria-pressed="false"><i class="fa fa-list" aria-hidden="true"></i>{{ 'List'|t }}</button>
+</div>

@@ -222,13 +222,22 @@ function _sacda_preprocess_repository_carousel(array &$variables): void {
   $variables['page']['#cache']['tags'][] = 'media_list';
   $variables['page']['#cache']['contexts'][] = 'user.permissions';
   $variables['page']['#cache']['contexts'][] = 'user.node_grants:view';
+  // A cached page would keep the same random selection on subsequent visits.
+  $variables['page']['#cache']['max-age'] = 0;
+  \Drupal::service('page_cache_kill_switch')->trigger();
   $storage = \Drupal::entityTypeManager()->getStorage('node');
   $ids = $storage->getQuery()->accessCheck(TRUE)
     ->condition('type', 'islandora_object')
     ->condition('status', 1)->condition('promote', 1)
     ->sort('created', 'DESC')->sort('nid', 'DESC')->execute();
+  $ids = array_values($ids);
+  shuffle($ids);
   $variables['carousel_slides'] = [];
-  foreach ($storage->loadMultiple($ids) as $node) {
+  foreach ($ids as $id) {
+    $node = $storage->load($id);
+    if (!$node) {
+      continue;
+    }
     $image = _sacda_front_page_image($node, $variables);
     if (!$image) {
       continue;
@@ -239,6 +248,9 @@ function _sacda_preprocess_repository_carousel(array &$variables): void {
       'title' => $node->label(),
       'link' => $node->toUrl()->toString(),
     ];
+    if (count($variables['carousel_slides']) === 10) {
+      break;
+    }
   }
 }
 
@@ -252,11 +264,23 @@ function _sacda_front_page_image(\Drupal\node\NodeInterface $node, array &$varia
     ->condition('field_media_of', $node->id())->condition('status', 1)
     ->sort('mid', 'DESC')->execute();
   $media_items = $storage->loadMultiple($ids);
+  // Collection covers are often discovered from their descendants, rather
+  // than attached directly. Use the same computed image as collection views.
+  if ($node->hasField('did_image') && !$node->get('did_image')->isEmpty()) {
+    $discovered = $node->get('did_image')->entity;
+    if ($discovered && $discovered->isPublished()) {
+      $access = $discovered->access('view', NULL, TRUE);
+      \Drupal::service('renderer')->addCacheableDependency($variables['page'], $access);
+      if ($access->isAllowed()) {
+        $media_items = [$discovered->id() => $discovered] + $media_items;
+      }
+    }
+  }
   // Prefer Islandora's generated thumbnail over an arbitrary attached file.
   $utils = \Drupal::service('islandora.utils');
   $term = $utils->getTermForUri('http://pcdm.org/use#ThumbnailImage');
   $thumbnail = $term ? $utils->getMediaWithTerm($node, $term) : NULL;
-  if ($thumbnail && isset($media_items[$thumbnail->id()])) {
+  if ($thumbnail && isset($media_items[$thumbnail->id()]) && empty($discovered)) {
     $media_items = [$thumbnail->id() => $media_items[$thumbnail->id()]] + $media_items;
   }
   foreach ($media_items as $media) {
@@ -276,6 +300,19 @@ function _sacda_front_page_image(\Drupal\node\NodeInterface $node, array &$varia
     }
   }
   return NULL;
+}
+
+/**
+ * Supplies discovered images to taxonomy result cards.
+ */
+function _sacda_preprocess_taxonomy_card(array &$variables): void {
+  $view = $variables['view'] ?? NULL;
+  if (!$view instanceof \Drupal\views\ViewExecutable || $view->id() !== 'taxonomy_term') {
+    return;
+  }
+  $cache = ['page' => ['#cache' => ['tags' => ['node_list', 'media_list']]]];
+  $variables['taxonomy_card_image'] = _sacda_front_page_image($variables['node'], $cache);
+  \Drupal::service('renderer')->addCacheableDependency($variables['elements'], \Drupal\Core\Cache\CacheableMetadata::createFromRenderArray($cache['page']));
 }
 
 /**
@@ -520,7 +557,7 @@ function sacda_preprocess_region(&$variables) {
     // squeezed the team/media grids well inside the band widths around them.
     $path = \Drupal::service('path.current')->getPath();
     $alias = \Drupal::service('path_alias.manager')->getAliasByPath($path);
-    $variables['self_widthed_content'] = str_starts_with($alias, '/about');
+    $variables['self_widthed_content'] = str_starts_with($alias, '/about') || $variables['route_name'] === 'view.taxonomy_term.page_1';
   }
 
   // "Clear all" for the facet sidebar: the current page without any facet

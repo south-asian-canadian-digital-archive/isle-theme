@@ -1,0 +1,6 @@
+{# All taxonomy term pages share the search results page layout. #}
+{% extends '@sacda/page/page.html.twig' %}
+
+{% block content %}
+	{% include '@sacda/components/results-layout.html.twig' with { compact_results_padding: true } %}
+{% endblock %}

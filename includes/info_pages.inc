@@ -130,6 +130,7 @@ function _sacda_preprocess_newsletter(array &$variables, string $theme_path): vo
  * Implements hook_preprocess_HOOK() for node.
  */
 function sacda_preprocess_node(array &$variables): void {
+  _sacda_preprocess_taxonomy_card($variables);
   $node = $variables['node'] ?? NULL;
   if (!$node || $node->bundle() !== 'page' || empty($variables['content']['body'])) {
     return;
