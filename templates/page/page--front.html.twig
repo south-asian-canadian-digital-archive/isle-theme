@@ -16,6 +16,7 @@
 		{{ page.highlighted }}
 		{# {{ page.breadcrumb }} #}
 
+		{% if carousel_slides %}
 		<div class="w-full min-h-[40vh] pt-4">
 			{% include '@sacda/block/sacda-carousel.html.twig' with {
 			slides: carousel_slides,
@@ -25,6 +26,8 @@
 			slides_per_view_mobile: 1,
 		} %}
 		</div>
+
+		{% endif %}
 
 		{{ page.content_above }}
 
@@ -119,24 +122,19 @@
 		</section>
 
 		{# 4. Explore Themes (Asymmetric Grid) #}
+		{% if front_themes %}
 		<section class="py-10 px-4 md:px-24">
 			<div class="hidden md:block mb-8 text-center">
 				<h2>Explore Themes</h2>
 				<p class="text-lg text-secondary">Navigate the digital archives through curated thematic collections.</p>
 			</div>
 
-			{% set themes = [
-				{ title: 'Advocacy', link: 'https://sacda.ca/themes/advocacy', image: theme_path ~ '/static/homepage/Advocacy-Theme_South-Asian-Canadian.jpg', colspan: 2, rowspan: 1 },
-				{ title: 'Arts and Culture', link: 'https://sacda.ca/themes/arts-culture', image: theme_path ~ '/static/homepage/Arts-Culture_South-Asian-Canadian.jpg', colspan: 1, rowspan: 2 },
-				{ title: 'Migration', link: 'https://sacda.ca/themes/migration', image: theme_path ~ '/static/homepage/Migration-theme_South-Asian-Canadian.jpg', colspan: 1, rowspan: 1 },
-				{ title: 'Family', link: 'https://sacda.ca/themes/family', image: theme_path ~ '/static/homepage/Family_South-Asian-Canadian.jpg', colspan: 1, rowspan: 1 }
-			] %}
 
 			<div class="hidden md:grid grid-cols-3 grid-rows-[25vw_25vw] gap-4">
-				{% for theme in themes %}
-					<div class="relative overflow-hidden group {% if theme.colspan == 2 %}col-span-2{% endif %} {% if theme.rowspan == 2 %}row-span-2{% endif %}">
+				{% for theme in front_themes %}
+					<div class="relative overflow-hidden group bg-light {% if loop.index == 1 %}col-span-2{% endif %} {% if loop.index == 2 %}row-span-2{% endif %}">
 						<a href="{{ theme.link }}" class="block w-full h-full">
-							<img src="{{ theme.image }}" alt="{{ theme.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+							{% if theme.image %}<img src="{{ theme.image }}" alt="{{ theme.image_alt }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">{% endif %}
 							<div class="absolute top-0 left-0 flex justify-center items-center min-w-[250px] lg:min-w-[300px] min-h-[60px] p-4 bg-primary">
 								<h3>{{ theme.title }}</h3>
 							</div>
@@ -149,9 +147,9 @@
 			<div class="md:hidden">
 				<h2>Explore Themes</h2>
 				<div class="flex flex-col gap-4">
-					{% for theme in themes %}
-						<a href="{{ theme.link }}" class="relative overflow-hidden h-48">
-							<img src="{{ theme.image }}" alt="{{ theme.title }}" class="w-full h-full object-cover">
+					{% for theme in front_themes %}
+						<a href="{{ theme.link }}" class="relative overflow-hidden h-48 bg-light">
+							{% if theme.image %}<img src="{{ theme.image }}" alt="{{ theme.image_alt }}" class="w-full h-full object-cover" loading="lazy">{% endif %}
 							<div class="absolute top-0 left-0 bg-primary p-3">
 								<h3>{{ theme.title }}</h3>
 							</div>
@@ -161,7 +159,10 @@
 			</div>
 		</section>
 
-		{# 5. Walk Through History (Recently Added) #}
+		{% endif %}
+
+		{# 5. Walk Through History (promoted collections) #}
+		{% if featured_collections %}
 		<section class="py-10 px-4 md:px-24 pb-16 md:pb-36">
 			<div class="flex flex-wrap mb-8">
 				<div class="w-full md:w-1/3">
@@ -172,17 +173,12 @@
 				</div>
 			</div>
 
-			{% set recent_items = [
-				{ title: 'Chandra Bodalia Collection', link: 'https://sacda.ca/collections/chandra-bodalia', image: theme_path ~ '/static/homepage/Chandra-Bodalia-Collection_South-Asian-Canadian.jpg' },
-				{ title: 'Del Monte Collection', link: 'https://sacda.ca/collections/del-monte', image: theme_path ~ '/static/homepage/delmonte.jpg' },
-				{ title: 'Joan Mayo Fonds', link: 'https://sacda.ca/collections/joan-mayo', image: theme_path ~ '/static/homepage/joanmayofonds.jpg' }
-			] %}
 
-			<div class="hidden md:grid grid-cols-3 gap-6 h-[25vw]">
-				{% for item in recent_items %}
-					<div class="relative overflow-hidden group h-full">
+			<div class="hidden md:grid grid-cols-3 gap-6 auto-rows-[25vw]">
+				{% for item in featured_collections %}
+					<div class="relative overflow-hidden group h-full bg-light">
 						<a href="{{ item.link }}" class="block w-full h-full">
-							<img src="{{ item.image }}" alt="{{ item.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+							{% if item.image %}<img src="{{ item.image }}" alt="{{ item.image_alt }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">{% endif %}
 							<div class="absolute bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-30px)] lg:w-[calc(100%-80px)] min-h-[60px] flex justify-center items-center bg-primary p-4">
 								<h3>{{ item.title }}</h3>
 							</div>
@@ -193,9 +189,9 @@
 
 			{# Mobile version #}
 			<div class="md:hidden flex flex-col gap-4">
-				{% for item in recent_items %}
-					<a href="{{ item.link }}" class="relative overflow-hidden h-48">
-						<img src="{{ item.image }}" alt="{{ item.title }}" class="w-full h-full object-cover">
+				{% for item in featured_collections %}
+					<a href="{{ item.link }}" class="relative overflow-hidden h-48 bg-light">
+						{% if item.image %}<img src="{{ item.image }}" alt="{{ item.image_alt }}" class="w-full h-full object-cover" loading="lazy">{% endif %}
 						<div class="absolute bottom-4 left-4 right-4 bg-primary p-3">
 							<h3>{{ item.title }}</h3>
 						</div>
@@ -203,6 +199,8 @@
 				{% endfor %}
 			</div>
 		</section>
+
+		{% endif %}
 
 		{# 6. Help Tell Our Story (CTA) #}
 		<section class="bg-light py-10 md:py-32 text-center">

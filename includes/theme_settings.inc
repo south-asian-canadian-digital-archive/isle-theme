@@ -24,9 +24,34 @@ function _sacda_build_theme_settings_form(array &$form, FormStateInterface $form
   
   // Carousel settings
   _sacda_build_carousel_settings($form);
+
+  _sacda_build_front_themes_settings($form);
   
   // Add submit handler
   $form['#submit'][] = 'sacda_theme_settings_submit';
+}
+
+/**
+ * Selects the subject terms displayed in the front-page theme grid.
+ */
+function _sacda_build_front_themes_settings(array &$form): void {
+  $form['front_themes'] = [
+    '#type' => 'details',
+    '#title' => t('Front page themes'),
+    '#description' => t('Choose up to four Subject terms. Each card links to the term page and uses an image from a matching published repository item.'),
+  ];
+  $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  for ($i = 1; $i <= 4; $i++) {
+    $key = 'front_theme_' . $i;
+    $tid = theme_get_setting($key);
+    $form['front_themes'][$key] = [
+      '#type' => 'entity_autocomplete',
+      '#title' => t('Theme @number', ['@number' => $i]),
+      '#target_type' => 'taxonomy_term',
+      '#selection_settings' => ['target_bundles' => ['subject']],
+      '#default_value' => $tid ? $storage->load($tid) : NULL,
+    ];
+  }
 }
 
 /**

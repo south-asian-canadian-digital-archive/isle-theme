@@ -49,7 +49,7 @@
 								{% endif %}
 
 								<img
-								src="{{ slide.image_url }}" alt="{{ slide.title ?: 'Carousel image' }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="{{ loop.first ? 'eager' : 'lazy' }}"/>
+								src="{{ slide.image_url }}" alt="{{ slide.image_alt|default(slide.title ?: 'Carousel image') }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="{{ loop.first ? 'eager' : 'lazy' }}"/>
 
 								{% if slide.link %}
 								</a>

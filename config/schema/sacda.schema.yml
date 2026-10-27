@@ -64,3 +64,15 @@ sacda.settings:
           link:
             type: string
             label: 'Link URL'
+    front_theme_1:
+      type: integer
+      label: 'Front page theme 1 subject term ID'
+    front_theme_2:
+      type: integer
+      label: 'Front page theme 2 subject term ID'
+    front_theme_3:
+      type: integer
+      label: 'Front page theme 3 subject term ID'
+    front_theme_4:
+      type: integer
+      label: 'Front page theme 4 subject term ID'

@@ -77,7 +77,10 @@ function sacda_preprocess_page(array &$variables): void {
   _sacda_preprocess_footer_social($variables);
   _sacda_add_color_variables($variables);
   _sacda_preprocess_carousel($variables, $theme_path);
+  _sacda_preprocess_repository_carousel($variables);
   _sacda_preprocess_featured_exhibits($variables);
+  _sacda_preprocess_featured_collections($variables);
+  _sacda_preprocess_front_themes($variables);
 
   // Recreate the original newsletter's Mailchimp-driven issue cards without
   // exposing the private API key used by the retired Pawtucket theme.
@@ -123,6 +126,156 @@ function sacda_preprocess_page(array &$variables): void {
     }
   }
   $variables['show_filters_sidebar'] = $show_filters;
+}
+
+/**
+ * Builds the curated subject cards on the front page.
+ */
+function _sacda_preprocess_front_themes(array &$variables): void {
+  if (!$variables['is_front']) {
+    return;
+  }
+  $variables['front_themes'] = [];
+  $variables['page']['#cache']['tags'][] = 'taxonomy_term_list';
+  $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  $nodes = \Drupal::entityTypeManager()->getStorage('node');
+  $seen = [];
+  for ($i = 1; $i <= 4; $i++) {
+    $tid = theme_get_setting('front_theme_' . $i);
+    if (!$tid || isset($seen[$tid]) || !($term = $terms->load($tid)) || $term->bundle() !== 'subject') {
+      continue;
+    }
+    $access = $term->access('view', NULL, TRUE);
+    \Drupal::service('renderer')->addCacheableDependency($variables['page'], $access);
+    if (!$access->isAllowed()) {
+      continue;
+    }
+    $seen[$tid] = TRUE;
+    $variables['page']['#cache']['tags'] = array_merge($variables['page']['#cache']['tags'], $term->getCacheTags());
+    $query = $nodes->getQuery()->accessCheck(TRUE)
+      ->condition('type', 'islandora_object')->condition('status', 1);
+    $subjects = $query->orConditionGroup()
+      ->condition('field_subject', $tid)
+      ->condition('field_sacda_thesaurus', $tid);
+    $ids = $query->condition($subjects)->sort('created', 'DESC')->sort('nid', 'DESC')->execute();
+    $image = NULL;
+    foreach ($nodes->loadMultiple($ids) as $node) {
+      if ($image = _sacda_front_page_image($node, $variables)) {
+        break;
+      }
+    }
+    $variables['front_themes'][] = [
+      'title' => $term->label(),
+      'link' => $term->toUrl()->toString(),
+      'image' => $image['url'] ?? NULL,
+      'image_alt' => $image['alt'] ?? '',
+    ];
+  }
+}
+
+/**
+ * Supplies promoted collection nodes to the front-page collection grid.
+ */
+function _sacda_preprocess_featured_collections(array &$variables): void {
+  if (!$variables['is_front']) {
+    return;
+  }
+
+  // Include list tags even when no content is promoted, so newly promoted
+  // nodes and newly added media invalidate the cached front page.
+  $variables['page']['#cache']['tags'][] = 'node_list';
+  $variables['page']['#cache']['tags'][] = 'media_list';
+  $variables['page']['#cache']['contexts'][] = 'user.permissions';
+  $variables['page']['#cache']['contexts'][] = 'user.node_grants:view';
+
+  $storage = \Drupal::entityTypeManager()->getStorage('node');
+  $ids = $storage->getQuery()
+    ->accessCheck(TRUE)
+    ->condition('type', 'collection')
+    ->condition('status', 1)
+    ->condition('promote', 1)
+    ->sort('created', 'DESC')
+    ->sort('nid', 'DESC')
+    ->execute();
+
+  $variables['featured_collections'] = [];
+  foreach ($storage->loadMultiple($ids) as $node) {
+    $image = _sacda_front_page_image($node, $variables);
+    $variables['featured_collections'][] = [
+      'title' => $node->label(),
+      'link' => $node->toUrl()->toString(),
+      'image' => $image['url'] ?? NULL,
+      'image_alt' => $image['alt'] ?? '',
+    ];
+  }
+}
+
+/**
+ * Replaces the front-page carousel with promoted repository items.
+ */
+function _sacda_preprocess_repository_carousel(array &$variables): void {
+  if (!$variables['is_front']) {
+    return;
+  }
+
+  $variables['page']['#cache']['tags'][] = 'node_list';
+  $variables['page']['#cache']['tags'][] = 'media_list';
+  $variables['page']['#cache']['contexts'][] = 'user.permissions';
+  $variables['page']['#cache']['contexts'][] = 'user.node_grants:view';
+  $storage = \Drupal::entityTypeManager()->getStorage('node');
+  $ids = $storage->getQuery()->accessCheck(TRUE)
+    ->condition('type', 'islandora_object')
+    ->condition('status', 1)->condition('promote', 1)
+    ->sort('created', 'DESC')->sort('nid', 'DESC')->execute();
+  $variables['carousel_slides'] = [];
+  foreach ($storage->loadMultiple($ids) as $node) {
+    $image = _sacda_front_page_image($node, $variables);
+    if (!$image) {
+      continue;
+    }
+    $variables['carousel_slides'][] = [
+      'image_url' => $image['url'],
+      'image_alt' => $image['alt'],
+      'title' => $node->label(),
+      'link' => $node->toUrl()->toString(),
+    ];
+  }
+}
+
+/**
+ * Finds accessible media attached to a repository node for a front-page card.
+ */
+function _sacda_front_page_image(\Drupal\node\NodeInterface $node, array &$variables): ?array {
+  $variables['page']['#cache']['tags'] = array_merge($variables['page']['#cache']['tags'], $node->getCacheTags());
+  $storage = \Drupal::entityTypeManager()->getStorage('media');
+  $ids = $storage->getQuery()->accessCheck(TRUE)
+    ->condition('field_media_of', $node->id())->condition('status', 1)
+    ->sort('mid', 'DESC')->execute();
+  $media_items = $storage->loadMultiple($ids);
+  // Prefer Islandora's generated thumbnail over an arbitrary attached file.
+  $utils = \Drupal::service('islandora.utils');
+  $term = $utils->getTermForUri('http://pcdm.org/use#ThumbnailImage');
+  $thumbnail = $term ? $utils->getMediaWithTerm($node, $term) : NULL;
+  if ($thumbnail && isset($media_items[$thumbnail->id()])) {
+    $media_items = [$thumbnail->id() => $media_items[$thumbnail->id()]] + $media_items;
+  }
+  foreach ($media_items as $media) {
+    $variables['page']['#cache']['tags'] = array_merge($variables['page']['#cache']['tags'], $media->getCacheTags());
+    foreach (['field_media_image', 'thumbnail'] as $field) {
+      if (!$media->hasField($field) || $media->get($field)->isEmpty()) {
+        continue;
+      }
+      $item = $media->get($field)->first();
+      if ($file = $item->entity) {
+        $variables['page']['#cache']['tags'] = array_merge($variables['page']['#cache']['tags'], $file->getCacheTags());
+        return [
+          'url' => \Drupal::service('file_url_generator')->generateString($file->getFileUri()),
+          'alt' => $item->getValue()['alt'] ?? '',
+        ];
+      }
+    }
+  }
+  return NULL;
 }
 
 /**
