@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF Viewer Prototype</title>
+<style>
+:root{--fg:#414042;--line:#e7e8e8;--accent:#f99d2a}
+body{margin:0;font:16px system-ui,sans-serif;color:var(--fg);background:#f4f4f4}
+header{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 16px;background:#fff;border-bottom:1px solid var(--line)}
+input{font-size:16px;height:36px;padding:0 10px;border:1px solid var(--line);flex:1 1 180px}
+button{height:36px;padding:0 12px;background:#fff;border:1px solid var(--fg);cursor:pointer}
+#pages{padding:16px}
+.page{position:relative;margin:0 auto 16px;background:#fff;box-shadow:0 1px 3px #0003;max-width:100%}
+canvas{display:block;width:100%;height:auto}
+.hit{position:absolute;background:var(--accent);opacity:.4;pointer-events:none}
+.hit.current{background:#d33;opacity:.45}
+</style>
+</head>
+<body>
+<header>
+  <input id="q" type="search" placeholder="Search this document" aria-label="Search this document">
+  <button id="prev">Previous</button><button id="next">Next</button>
+  <span id="status" role="status"></span>
+</header>
+<main id="pages"></main>
+<script type="module">
+// Usage: ?file=<pdf url>&ocr=<optional words json>
+// OCR json: {"1":[{"text":"word","x":0.1,"y":0.2,"w":0.05,"h":0.02}]}, normalised to the page.
+import * as pdfjs from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs';
+pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+const qs = new URLSearchParams(location.search), $ = id => document.getElementById(id);
+const file = qs.get('file'), ocrUrl = qs.get('ocr');
+const words = {}; // page -> [{text,x,y,w,h}] normalised
+let hits = [], cur = -1;
+
+async function load() {
+  if (!file) { $('status').textContent = 'Add ?file= to load a PDF.'; return; }
+  const doc = await pdfjs.getDocument(file).promise;
+  const ocr = ocrUrl ? await (await fetch(ocrUrl)).json() : {};
+  for (let n = 1; n <= doc.numPages; n++) {
+    const page = await doc.getPage(n), vp = page.getViewport({scale: 1.5});
+    const box = document.createElement('div'); box.className = 'page'; box.dataset.page = n; box.style.width = vp.width + 'px';
+    const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height; box.append(c); $('pages').append(box);
+    await page.render({canvasContext: c.getContext('2d'), viewport: vp}).promise;
+    const text = await page.getTextContent();
+    words[n] = ocr[n] || text.items.filter(i => i.str.trim()).map(i => {
+      const [x, y] = vp.convertToViewportPoint(i.transform[4], i.transform[5]), h = i.height * 1.5, w = i.width * 1.5;
+      return {text: i.str, x: x / vp.width, y: (y - h) / vp.height, w: w / vp.width, h: h / vp.height};
+    });
+  }
+  $('status').textContent = doc.numPages + ' pages';
+}
+
+function search(q) {
+  document.querySelectorAll('.hit').forEach(e => e.remove()); hits = []; cur = -1;
+  q = q.trim().toLowerCase();
+  if (!q) { $('status').textContent = ''; return; }
+  for (const [n, list] of Object.entries(words)) for (const it of list) {
+    const s = it.text.toLowerCase();
+    for (let i = s.indexOf(q); i >= 0; i = s.indexOf(q, i + q.length)) {
+      const unit = it.w / s.length, el = document.createElement('div'); el.className = 'hit';
+      Object.assign(el.style, {left: (it.x + unit * i) * 100 + '%', top: it.y * 100 + '%', width: unit * q.length * 100 + '%', height: it.h * 100 + '%'});
+      document.querySelector(`[data-page="${n}"]`).append(el); hits.push(el);
+    }
+  }
+  step(1);
+}
+function step(d) {
+  if (!hits.length) { $('status').textContent = 'No matches'; return; }
+  hits[cur]?.classList.remove('current');
+  cur = (cur + d + hits.length) % hits.length;
+  hits[cur].classList.add('current'); hits[cur].scrollIntoView({block: 'center'});
+  $('status').textContent = `${cur + 1} of ${hits.length}`;
+}
+$('q').addEventListener('input', e => search(e.target.value));
+$('q').addEventListener('keydown', e => { if (e.key === 'Enter') step(e.shiftKey ? -1 : 1); });
+$('prev').onclick = () => step(-1); $('next').onclick = () => step(1);
+load().catch(e => { $('status').textContent = 'Could not load PDF: ' + e.message; });
+</script>
+</body>
+</html>
