@@ -191,7 +191,9 @@ function _sacda_preprocess_featured_collections(array &$variables): void {
   $storage = \Drupal::entityTypeManager()->getStorage('node');
   $ids = $storage->getQuery()
     ->accessCheck(TRUE)
-    ->condition('type', 'collection')
+    ->condition($storage->getQuery()->orConditionGroup()
+      ->condition('type', 'collection')
+      ->condition('field_archival_level.entity.name', 'Collection'))
     ->condition('status', 1)
     ->condition('promote', 1)
     ->sort('created', 'DESC')
