@@ -14,11 +14,25 @@ function Player({ mount, hasTranscript, ratio }) {
       [['input[data-testid="transcript-search-input"]', 'Search transcript'],
        ['select[data-testid="transcript-select-option"]', 'Transcript language']].forEach(([selector, title], index) => {
         const control = mount.querySelector(selector);
-        if (!control || control.dataset.labelled) return;
-        control.dataset.labelled = 'true';
-        control.id = `${mount.id}-control-${index}`;
-        const label = document.createElement('label'); label.className = 'sacda-control-label';
-        label.htmlFor = control.id; label.textContent = title; control.before(label);
+        if (!control) return;
+        if (!control.dataset.labelled) {
+          control.dataset.labelled = 'true';
+          control.id = `${mount.id}-control-${index}`;
+          const label = document.createElement('label'); label.className = 'visually-hidden';
+          label.htmlFor = control.id; label.textContent = title; control.before(label);
+        }
+        if (control.tagName === 'SELECT') {
+          const single = control.options.length === 1;
+          control.hidden = single;
+          let language = control.parentElement.querySelector('.sacda-transcript-language');
+          if (!language) {
+            language = document.createElement('span'); language.className = 'sacda-transcript-language';
+            control.before(language);
+          }
+          language.hidden = !single;
+          const value = single ? control.options[0].text : '';
+          if (language.textContent !== value) language.textContent = value;
+        }
       });
       const text = [...mount.querySelectorAll('.ramp--transcript_text')]
         .map(line => line.textContent.trim()).filter(Boolean).join(' ');
@@ -61,14 +75,13 @@ function Player({ mount, hasTranscript, ratio }) {
   };
   return <IIIFPlayer manifestUrl={mount.dataset.sacdaAv}>
     <div ref={ref} className={`sacda-av ${tab === 'plain' ? 'sacda-av--plain' : ''}`}>
-      {hasTranscript && <div className="sacda-viewer-toolbar">
-        <button type="button" className="sacda-panel-toggle" aria-expanded={open}
-          aria-controls={`${mount.id}-text`} onClick={() => setOpen(!open)}>{open ? 'Hide transcript' : 'Show transcript'}</button>
-      </div>}
-      <div className={`sacda-av-layout ${!open || !hasTranscript ? 'sacda-av-layout--media' : ''}`}>
+      <div className={`sacda-av-layout ${!hasTranscript ? 'sacda-av-layout--media' : !open ? 'sacda-av-layout--collapsed' : ''}`}>
         <div className="sacda-av-stage" style={{ '--media-ratio': ratio }}><MediaPlayer enableFileDownload={false} /></div>
-        {hasTranscript && <section className="sacda-av-transcript" id={`${mount.id}-text`} hidden={!open}>
-          <div className="sacda-viewer-toolbar">
+        {hasTranscript && <details className="sacda-av-transcript sacda-text-panel" id={`${mount.id}-text`} open={open}
+          onToggle={event => setOpen(event.currentTarget.open)}>
+          <summary>Transcript</summary>
+          <div className="sacda-av-transcript-body">
+          <div className="sacda-viewer-toolbar sacda-transcript-tabs">
             <div role="tablist" aria-label="Transcript format" onKeyDown={event => {
               if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
                 event.preventDefault();
@@ -90,7 +103,8 @@ function Player({ mount, hasTranscript, ratio }) {
             <span className="text-sm" role="status">{copied ? 'Copied' : ''}</span>
             <textarea ref={plainRef} aria-label="Plain text transcript" className="form-textarea w-full" rows="12" readOnly value={plainText} />
           </div>
-        </section>}
+          </div>
+        </details>}
       </div>
     </div>
   </IIIFPlayer>;

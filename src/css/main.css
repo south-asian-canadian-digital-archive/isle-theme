@@ -767,6 +767,7 @@ div.views-element-container > div.view-list {
 /* Use the shared .form-text control; only adjust facet spacing. Unlayered so
    the widget's mb-2 utility cannot undo the space before its options. */
 .result-facets .facets-filter {
+    background-color: var(--background);
     padding: .5rem .875rem;
     margin-bottom: 1rem;
 }

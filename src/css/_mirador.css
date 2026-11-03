@@ -213,7 +213,7 @@
 [data-sacda-av] .ramp--transcript_selector .ramp--transcript_downloader { width: 2.75rem; min-width: 2.75rem; flex: 0 0 2.75rem; height: 2.75rem; }
 [data-sacda-av] .sacda-av-stage, [data-sacda-av] .sacda-av-stage > *, [data-sacda-av] .video-js { min-width: 0; max-width: 100%; }
 /* Source/attribution URLs must not widen an otherwise responsive item page. */
-.node--type-islandora-object { overflow-wrap: anywhere; }
+.node--type-islandora-object { overflow-wrap: anywhere; scroll-margin-top: calc(var(--header-height, 80px) + 1rem); }
 /* Keep offscreen VideoJS menu/track contents inside the player region. */
 [data-sacda-av] { overflow-x: clip; }
 
@@ -223,3 +223,50 @@
 [data-sacda-av] .sacda-av--plain .ramp--transcript_auto_scroll_check { display: none; }
 [data-sacda-av] textarea[aria-label="Plain text transcript"] { display: block; resize: vertical; margin-top: 1rem; }
 .sacda-reader > .sacda-image-transcript[hidden] { display: none; }
+
+/* Reserve a gutter and keep OCR lines clear of their own scrollbar. */
+.sacda-image-transcript { overflow: hidden; }
+.sacda-text-panel { scrollbar-gutter: stable; overscroll-behavior-y: auto; }
+.sacda-text-panel__body { padding-inline-end: 1.5rem; }
+.sacda-text-search-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-block: .25rem .75rem; }
+.sacda-text-search-controls .sacda-panel-toggle { width: auto; padding: .25rem 0; font-size: .875rem; }
+.sacda-text-search-controls button:disabled { opacity: .5; cursor: default; }
+.sacda-image-transcript button.sacda-ocr-match { background: #fff1cc; }
+.sacda-image-transcript button.sacda-ocr-current { outline: 2px solid var(--foreground); outline-offset: -2px; }
+
+/* The transcript handle remains at the right edge when the panel is closed. */
+.sacda-av-layout--collapsed { grid-template-columns: minmax(0, 1fr) 3.5rem; }
+[data-sacda-av] .sacda-av-transcript { height: 72vh; max-height: 72vh; overflow: hidden; }
+[data-sacda-av] .sacda-av-transcript > summary { height: 3.5rem; }
+[data-sacda-av] .sacda-av-transcript:not([open]) > summary { writing-mode: vertical-rl; height: 100%; justify-content: start; }
+.sacda-av-transcript-body { height: calc(100% - 3.5rem); display: flex; flex-direction: column; min-height: 0; }
+.sacda-av-transcript-body > .sacda-viewer-toolbar { flex-shrink: 0; }
+.sacda-av-transcript-body > [id$="-timeline-panel"] { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+[data-sacda-av] .sacda-av-transcript-body .ramp--transcript_nav { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+[data-sacda-av] .sacda-av-transcript-body .ramp--transcript_menu { flex-shrink: 0; }
+[data-sacda-av] .sacda-av-transcript-body .transcript_content { min-height: 0; max-height: none; flex: 1; overflow-y: auto; scrollbar-gutter: stable; padding-inline-end: 1.5rem; }
+[data-sacda-av] .sacda-av--plain [id$="-timeline-panel"] { flex: 0 0 auto; }
+[data-sacda-av] .sacda-av-transcript-body > [id$="-plain-panel"] { min-height: 0; overflow-y: auto; scrollbar-gutter: stable; }
+.sacda-text-search-slot { position: sticky; top: 0; z-index: 2; background: var(--background); }
+
+.media-content-wrapper { margin-block-start: 1rem; }
+[data-sacda-av] .sacda-av-transcript { position: relative; }
+[data-sacda-av] .sacda-transcript-tabs { position: absolute; inset-block-start: 0; inset-inline-end: 0; height: 3.5rem; padding: 0 .75rem; background: transparent; }
+[data-sacda-av] .sacda-transcript-tabs [role="tab"] { font-size: .875rem; white-space: nowrap; }
+[data-sacda-av] .ramp--transcript_menu { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: .5rem .75rem; gap: .4rem; }
+[data-sacda-av] .ramp--transcript_search { grid-column: 1 / -1; }
+[data-sacda-av] .ramp--transcript_selector { width: auto; min-width: 0; align-items: center; }
+[data-sacda-av] .ramp--transcript_menu-info { font-size: .75rem; }
+[data-sacda-av] .ramp--transcript_auto_scroll_check { margin: 0; }
+[data-sacda-av] .ramp--transcript_auto_scroll_check label { font-size: .75rem; }
+[data-sacda-av] .sacda-transcript-language { font-size: .8rem; }
+[data-sacda-av] .ramp--transcript_selector .ramp--transcript_downloader { width: 2rem; min-width: 2rem; height: 2rem; flex-basis: 2rem; }
+[data-sacda-av] .sacda-av-transcript-body > [id$="-plain-panel"] { flex: 1; display: flex; flex-direction: column; gap: .5rem; }
+[data-sacda-av] .sacda-av-transcript-body > [id$="-plain-panel"] > button { flex-shrink: 0; }
+[data-sacda-av] textarea[aria-label="Plain text transcript"] { flex: 1; min-height: 10rem; max-width: none; margin-top: 0; }
+@media (max-width: 400px) {
+    [data-sacda-av] .sacda-transcript-tabs { padding-inline: .35rem; }
+    [data-sacda-av] .sacda-transcript-tabs [role="tablist"] { gap: .35rem; }
+    [data-sacda-av] .sacda-transcript-tabs [role="tab"] { font-size: .75rem; padding-inline: .15rem; }
+    [data-sacda-av] .sacda-av-transcript > summary { font-size: .875rem; padding-inline: .75rem; }
+}
