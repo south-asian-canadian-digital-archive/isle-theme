@@ -31,9 +31,9 @@
             frame.contentDocument.head.append(style);
             const clear = () => frame.contentDocument.querySelectorAll('.sacda-pdf-highlight').forEach(box => box.remove());
             let version = 0;
-            const render = async () => {
+            const render = async (event = {}) => {
               const request = ++version;
-              const pageNumber = app.pdfViewer.currentPageNumber || 1;
+              const pageNumber = event.pageNumber || app.pdfViewer.currentPageNumber || 1;
               const page = await app.pdfDocument.getPage(pageNumber);
               const content = await page.getTextContent();
               if (request !== version || !frame.isConnected) return;

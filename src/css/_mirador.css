@@ -163,7 +163,7 @@
 .sacda-av-stage { min-width: 0; background: #000; }
 [data-sacda-av] [hidden] { display: none !important; }
 /* VideoJS's fluid 16:9 padding must not override square/portrait manifests. */
-[data-sacda-av] .sacda-av-stage .video-js.vjs-fluid { width: 100%; height: auto; aspect-ratio: var(--media-ratio); padding-top: 0; max-height: 72vh; }
+[data-sacda-av] .sacda-av-stage .video-js.vjs-fluid { width: 100%; min-width: 0; height: auto; aspect-ratio: var(--media-ratio); padding-top: 0; max-height: 72vh; }
 [data-sacda-av] .sacda-av-stage .video-js.vjs-audio-only-mode { aspect-ratio: auto; min-height: 5rem; }
 [data-sacda-av] .video-js video.vjs-tech { object-fit: contain; width: 100%; height: 100%; }
 .sacda-av-transcript { min-width: 0; background: var(--background); border: 1px solid var(--muted); }
@@ -219,3 +219,6 @@
 .media-content-wrapper .mirador-viewer :is(.MuiButtonBase-root, .MuiPaper-root),
 .media-content-wrapper .mirador-sidebar-toggle { border-radius: 0; }
 .media-content-wrapper .mirador-viewer .MuiPaper-root { box-shadow: none; }
+[data-sacda-av] .ramp--transcript_search_input { display: block; position: relative; }
+[data-sacda-av] .ramp--transcript_selector .ramp--transcript_downloader { width: 2.75rem; min-width: 2.75rem; flex: 0 0 2.75rem; height: 2.75rem; }
+[data-sacda-av] .sacda-av-stage, [data-sacda-av] .sacda-av-stage > *, [data-sacda-av] .video-js { min-width: 0; max-width: 100%; }

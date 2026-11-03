@@ -49,7 +49,17 @@ function Player({ mount, hasTranscript, ratio }) {
         aria-labelledby={hasTranscript ? `${mount.id}-${tab}-tab` : undefined}
         className={`sacda-av-layout ${tab === 'text' ? 'sacda-av-layout--text' : !open || !hasTranscript ? 'sacda-av-layout--media' : ''}`}>
         <div className="sacda-av-stage" hidden={tab === 'text'} style={{ '--media-ratio': ratio }}><MediaPlayer enableFileDownload={false} /></div>
-        {hasTranscript && <section className="sacda-av-transcript" id={`${mount.id}-text`} hidden={tab === 'media' && !open}>
+        {hasTranscript && <section onClickCapture={event => {
+          if (!timestamps && event.target.closest('.ramp--transcript_text')) {
+            event.preventDefault(); event.stopPropagation();
+            event.target.closest('.ramp--transcript_item')?.querySelector('.ramp--transcript_time')?.click();
+          }
+        }} onKeyDownCapture={event => {
+          if (!timestamps && ['Enter', ' '].includes(event.key) && event.target.matches('.ramp--transcript_text')) {
+            event.preventDefault(); event.stopPropagation();
+            event.target.closest('.ramp--transcript_item')?.querySelector('.ramp--transcript_time')?.click();
+          }
+        }} className="sacda-av-transcript" id={`${mount.id}-text`} hidden={tab === 'media' && !open}>
           <div className="sacda-transcript-options"><label><input type="checkbox" checked={timestamps}
             onChange={event => setTimestamps(event.target.checked)} /> Show timestamps</label></div>
           <Transcript playerID={mount.id} manifestUrl={mount.dataset.sacdaAv} />
