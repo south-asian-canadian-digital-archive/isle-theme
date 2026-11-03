@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { setupPdfScrolling } from "../../viewers/pdf-scroll.js";
 
 /**
  * Expands the PDF poster card (templates/field/media--pdfjs.html.twig) into the
@@ -15,7 +14,6 @@ import { setupPdfScrolling } from "../../viewers/pdf-scroll.js";
  */
 
 ((Drupal) => {
-    const cleanup = new WeakMap();
     function pick(selector, context) {
         if (window.once) {
             return window.once("sacdaPdfPreview", selector, context);
@@ -43,8 +41,6 @@ import { setupPdfScrolling } from "../../viewers/pdf-scroll.js";
                     const stage = document.createElement("div");
                     stage.className = "sacda-pdf-document";
                     stage.appendChild(tpl.content.cloneNode(true));
-                    const frame = stage.querySelector("iframe");
-                    if (frame) cleanup.set(el, setupPdfScrolling(frame));
                     viewer.appendChild(stage);
                     viewer.hidden = false;
                     poster.hidden = true;
@@ -65,10 +61,6 @@ import { setupPdfScrolling } from "../../viewers/pdf-scroll.js";
                     window.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
                 });
             });
-        },
-        detach: (context, settings, trigger) => {
-            if (trigger !== 'unload') return;
-            context.querySelectorAll?.('[data-pdf-preview]').forEach(el => cleanup.get(el)?.());
         },
     };
 })(Drupal);
