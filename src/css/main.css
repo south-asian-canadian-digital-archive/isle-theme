@@ -311,11 +311,6 @@
         font-family: "Font Awesome 6 Free";
     }
 
-    .result-facets .facets-filter {
-        @apply h-9 w-full max-w-none rounded-none border border-border bg-background px-3 font-body text-base text-foreground
-            placeholder:text-muted-foreground hover:border-primary focus:border-primary focus:outline-none;
-    }
-
     .result-facets .facets-filter-empty {
         @apply m-0 px-1 py-2 font-body text-sm text-muted-foreground;
     }
@@ -767,4 +762,11 @@ div.views-element-container > div.view-list {
 }
 [data-results-display-controls][hidden] {
     display: none;
+}
+
+/* Use the shared .form-text control; only adjust facet spacing. Unlayered so
+   the widget's mb-2 utility cannot undo the space before its options. */
+.result-facets .facets-filter {
+    padding: .5rem .875rem;
+    margin-bottom: 1rem;
 }
