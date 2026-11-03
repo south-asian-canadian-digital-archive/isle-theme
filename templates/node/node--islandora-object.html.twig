@@ -29,6 +29,19 @@
 				{% if content.group_backlinks %}
 					{{ content.group_backlinks }}
 				{% endif %}
+                {% if item_downloads %}
+                    <details class="sacda-downloads" open>
+                        <summary>{{ 'Downloads'|t }}</summary>
+                        <ul>
+                        {% for file in item_downloads %}
+                            <li><a href="{{ file.url }}" download="{{ file.name }}">
+                                <span>{{ file.label }} <span aria-hidden="true">↓</span></span>
+                                <small>{{ file.format }} · {{ file.size }}</small>
+                            </a></li>
+                        {% endfor %}
+                        </ul>
+                    </details>
+                {% endif %}
 				{% if content.group_location %}
 					{{ content.group_location }}
 				{% endif %}

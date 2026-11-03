@@ -38,7 +38,10 @@
                 if (!trigger || !poster || !viewer || !tpl) return;
 
                 trigger.addEventListener("click", () => {
-                    viewer.appendChild(tpl.content.cloneNode(true));
+                    const stage = document.createElement("div");
+                    stage.className = "sacda-pdf-document";
+                    stage.appendChild(tpl.content.cloneNode(true));
+                    viewer.appendChild(stage);
                     viewer.hidden = false;
                     poster.hidden = true;
                     el.classList.add("is-expanded");
