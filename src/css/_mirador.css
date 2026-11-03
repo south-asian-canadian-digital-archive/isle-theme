@@ -140,12 +140,12 @@
 /* Reader controls share the square grey headers and orange focus of item cards. */
 .sacda-image-transcript { padding: 0; border-color: var(--muted); }
 .sacda-text-panel { height: 100%; overflow: auto; }
-.sacda-text-panel > summary, .sacda-downloads > summary {
+.sacda-text-panel > summary {
     cursor: pointer; display: flex; align-items: center; justify-content: space-between;
     background: var(--muted); padding: 1rem; font-family: var(--font-heading); font-weight: 700;
     list-style: none; border-radius: 0;
 }
-.sacda-text-panel > summary::-webkit-details-marker, .sacda-downloads > summary::-webkit-details-marker { display: none; }
+.sacda-text-panel > summary::-webkit-details-marker { display: none; }
 .sacda-text-panel__body { padding: 1rem; }
 .sacda-image-transcript:has(details:not([open])) { flex: 0 0 3.5rem; max-width: 3.5rem; }
 .sacda-image-transcript details:not([open]) > summary { writing-mode: vertical-rl; height: 100%; gap: 1rem; justify-content: start; }
@@ -186,12 +186,7 @@
 [data-sacda-av] .sacda-av--plain .ramp--transcript_time { display: none; }
 [data-sacda-av] .sacda-av--plain .ramp--transcript_item { display: block; }
 [data-sacda-av] :is(button, input, select, [tabindex="0"]):focus-visible,
-.sacda-text-panel summary:focus-visible, .sacda-downloads a:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.sacda-downloads ul { list-style: none; margin: 0; padding: 0 1rem; }
-.sacda-downloads li + li { border-top: 1px solid var(--muted); }
-.sacda-downloads a { display: block; padding: 1rem 0; }
-.sacda-downloads a > span { display: flex; justify-content: space-between; font-weight: 600; }
-.sacda-downloads small { display: block; font-size: .8rem; margin-top: .25rem; }
+.sacda-text-panel summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 @media (max-width: 700px) {
     .sacda-av-layout { grid-template-columns: minmax(0, 1fr); }
     .sacda-image-transcript:has(details:not([open])) { flex-basis: 3.5rem; max-width: none; }

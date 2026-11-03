@@ -30,16 +30,16 @@
 					{{ content.group_backlinks }}
 				{% endif %}
                 {% if item_downloads %}
-                    <details class="sacda-downloads" open>
+                    <details class="form-wrapper sacda-downloads" open>
                         <summary>{{ 'Downloads'|t }}</summary>
-                        <ul>
                         {% for file in item_downloads %}
-                            <li><a href="{{ file.url }}" download="{{ file.name }}">
-                                <span>{{ file.label }} <span aria-hidden="true">↓</span></span>
-                                <small>{{ file.format }} · {{ file.size }}</small>
-                            </a></li>
+                            <div class="mb-4">
+                                <div class="text-xs font-bold text-muted-foreground tracking-wider mb-1">{{ file.label }}</div>
+                                <div class="text-sm text-foreground prose dark:prose-invert max-w-none">
+                                    <a href="{{ file.url }}" download="{{ file.name }}">{{ file.format }} · {{ file.size }} <span aria-hidden="true">↓</span></a>
+                                </div>
+                            </div>
                         {% endfor %}
-                        </ul>
                     </details>
                 {% endif %}
 				{% if content.group_location %}
