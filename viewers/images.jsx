@@ -2,9 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Mirador, { getVisibleCanvases, miradorSlice } from 'mirador';
 import textOverlay from 'mirador-textoverlay';
+import { attachRecognizedTextSearch } from './recognized-text-search.js';
 
 function Transcript({ viewer, canvases, texts, windowId }) {
   const overlay = useRef(null);
+  const searchSlot = useRef(null);
+  const lines = useRef(null);
   const panel = document.querySelector(`[data-transcript-for="${windowId}"]`)
     || document.querySelector('.sacda-reader [data-image-transcript]');
   const clear = () => {
@@ -17,6 +20,10 @@ function Transcript({ viewer, canvases, texts, windowId }) {
   useEffect(() => {
     if (panel) panel.hidden = pages.length === 0;
   }, [panel, pages.length]);
+  useEffect(() => {
+    if (!panel || !searchSlot.current || !lines.current) return;
+    return attachRecognizedTextSearch(searchSlot.current, lines.current, panel.querySelector('.sacda-text-panel'));
+  }, [panel]);
   if (!panel) return null;
   const highlight = (line, page, seek = false) => {
     clear();
@@ -35,12 +42,15 @@ function Transcript({ viewer, canvases, texts, windowId }) {
     <summary>Recognized text</summary>
     <div className="sacda-text-panel__body">
       <p className="sacda-transcript-note">Automatically recognized text may contain errors.</p>
+      <div ref={searchSlot} className="sacda-text-search-slot" />
+      <div ref={lines}>
       {pages.map(page => <div key={page.canvas.id} dir="auto">
-        {page.text.lines.map((line, index) => <button key={index} type="button"
+        {page.text.lines.map((line, index) => <button data-ocr-line key={index} type="button"
           onMouseEnter={() => highlight(line, page)} onMouseLeave={clear}
           onFocus={() => highlight(line, page)} onBlur={clear}
           onClick={() => highlight(line, page, true)}>{line.text || line.spans?.map(s => s.text).join('')}</button>)}
       </div>)}
+      </div>
     </div>
   </details>, panel);
 }

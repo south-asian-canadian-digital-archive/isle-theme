@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { attachRecognizedTextSearch } from '../../viewers/recognized-text-search.js';
 // Reuse PDF.js's embedded text layer. No separate OCR copy or PDF renderer.
 ((Drupal) => {
   Drupal.behaviors.sacdaPdfText = {
@@ -25,7 +26,9 @@
             const details = document.createElement('details'); details.open = true; details.className = 'sacda-text-panel';
             const summary = document.createElement('summary'); summary.textContent = Drupal.t('Recognized text');
             const body = document.createElement('div'); body.className = 'sacda-text-panel__body'; body.dir = 'auto';
-            details.append(summary, body); aside.append(details); viewer.append(aside);
+            const searchSlot = document.createElement('div'); searchSlot.className = 'sacda-text-panel__body sacda-text-search-slot';
+            details.append(summary, searchSlot, body); aside.append(details); viewer.append(aside);
+            attachRecognizedTextSearch(searchSlot, body, details, 'Search text on this page');
             const style = frame.contentDocument.createElement('style');
             style.textContent = '.sacda-pdf-highlight{position:absolute;background:#ffce3466;outline:1px solid #414042;pointer-events:none;z-index:5}';
             frame.contentDocument.head.append(style);
@@ -50,7 +53,7 @@
               const note = document.createElement('p'); note.className = 'sacda-transcript-note';
               note.textContent = Drupal.t('Text layer · Page @page', { '@page': pageNumber }); body.append(note);
               for (const items of lines) {
-                const button = document.createElement('button'); button.type = 'button';
+                const button = document.createElement('button'); button.type = 'button'; button.dataset.ocrLine = '';
                 button.textContent = items.map(item => item.str).join(' ');
                 const highlight = (scroll = false) => {
                   clear(); const view = app.pdfViewer.getPageView(pageNumber - 1);
@@ -64,7 +67,11 @@
                     const box = document.createElement('div'); box.className = 'sacda-pdf-highlight';
                     Object.assign(box.style, { left: `${x}px`, top: `${y-height}px`, width: `${item.width*view.viewport.scale}px`, height: `${height*1.2}px` });
                     view.div.append(box);
-                    if (scroll) { box.scrollIntoView({ block: 'center', behavior: 'smooth' }); scroll = false; }
+                    if (scroll) {
+                      const scroller = frame.contentDocument.getElementById('viewerContainer');
+                      if (scroller) scroller.scrollTop += box.getBoundingClientRect().top - scroller.getBoundingClientRect().top - scroller.clientHeight / 2;
+                      scroll = false;
+                    }
                   }
                 };
                 button.addEventListener('mouseenter', () => highlight()); button.addEventListener('mouseleave', clear);
