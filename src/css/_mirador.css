@@ -223,6 +223,6 @@
 [data-sacda-av] .ramp--transcript_selector .ramp--transcript_downloader { width: 2.75rem; min-width: 2.75rem; flex: 0 0 2.75rem; height: 2.75rem; }
 [data-sacda-av] .sacda-av-stage, [data-sacda-av] .sacda-av-stage > *, [data-sacda-av] .video-js { min-width: 0; max-width: 100%; }
 /* Source/attribution URLs must not widen an otherwise responsive item page. */
-.node--type-islandora-object a { overflow-wrap: anywhere; }
+.node--type-islandora-object { overflow-wrap: anywhere; }
 /* Keep offscreen VideoJS menu/track contents inside the player region. */
 [data-sacda-av] { overflow-x: clip; }
