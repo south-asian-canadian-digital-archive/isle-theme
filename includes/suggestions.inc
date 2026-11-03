@@ -78,6 +78,12 @@ function sacda_theme_suggestions_menu_alter(array &$suggestions, array $variable
  * Implements hook_theme_suggestions_HOOK_alter() for node templates.
  */
 function sacda_theme_suggestions_node_alter(array &$suggestions, array $variables): void {
+  // Collections are archival components at the Collection level.
+  $node = $variables['elements']['#node'] ?? NULL;
+  if ($node && $node->bundle() === 'archival_component'
+    && $node->get('field_archival_level')->entity?->label() === 'Collection') {
+    $suggestions[] = 'node__collection';
+  }
   if (isset($variables['view']) && $variables['view'] instanceof \Drupal\views\ViewExecutable) {
     $suggestions[] = 'node__view__' . $variables['view']->id();
     $suggestions[] = 'node__view__' . $variables['view']->id() . '__' . $variables['view']->current_display;

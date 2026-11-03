@@ -311,6 +311,31 @@
         font-family: "Font Awesome 6 Free";
     }
 
+    .result-facets .facets-filter {
+        @apply h-9 w-full max-w-none rounded-none border border-border bg-background px-3 font-body text-base text-foreground
+            placeholder:text-muted-foreground hover:border-primary focus:border-primary focus:outline-none;
+    }
+
+    .result-facets .facets-filter-empty {
+        @apply m-0 px-1 py-2 font-body text-sm text-muted-foreground;
+    }
+
+    .item-transcript {
+        @apply mt-8 border border-border;
+    }
+
+    .item-transcript > summary {
+        @apply cursor-pointer bg-muted px-4 py-3 font-heading text-base text-foreground;
+    }
+
+    .item-transcript__note {
+        @apply m-0 px-4 pt-3 font-body text-sm text-muted-foreground;
+    }
+
+    .item-transcript__text {
+        @apply max-h-96 overflow-y-auto whitespace-pre-wrap break-words px-4 py-3 font-body text-base text-foreground;
+    }
+
     .filters-sidebar--hidden {
         display: none;
     }
