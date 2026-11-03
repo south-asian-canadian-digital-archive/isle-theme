@@ -20,13 +20,6 @@
 			{# <div class="bg-card p-6 border border-border"> #}
 				{{ content|without('group_backlinks', 'group_location') }}
 			<!--</div>-->
-			{% if ocr_text %}
-				<details class="item-transcript">
-					<summary>{{ 'Transcript'|t }}</summary>
-					<p class="item-transcript__note">{{ 'Generated automatically, so it may contain errors.'|t }}</p>
-					<div class="item-transcript__text" tabindex="0">{{ ocr_text }}</div>
-				</details>
-			{% endif %}
 		</div>
 
 		{# Sidebar (right) - backlinks and location #}
