@@ -12,10 +12,12 @@ function Transcript({ viewer, canvases, texts, windowId }) {
     overlay.current = null;
   };
   useEffect(() => clear, [viewer, canvases.map(c => c.id).join('|')]);
-  if (!panel) return null;
   const pages = canvases.map((canvas, index) => ({ canvas, index, text: texts?.[canvas.id]?.text }))
     .filter(page => page.text?.lines?.length);
-  panel.hidden = pages.length === 0;
+  useEffect(() => {
+    if (panel) panel.hidden = pages.length === 0;
+  }, [panel, pages.length]);
+  if (!panel) return null;
   const highlight = (line, page, seek = false) => {
     clear();
     const image = viewer?.world.getItemAt(page.index);
@@ -29,16 +31,18 @@ function Transcript({ viewer, canvases, texts, windowId }) {
     overlay.current = box;
     if (seek) viewer.viewport.fitBounds(rect, false);
   };
-  return createPortal(<>
-    <details className="sacda-text-panel" open><summary>Recognized text <span aria-hidden="true">⌄</span></summary><div className="sacda-text-panel__body">
-    <p className="sacda-transcript-note">Automatically recognized text may contain errors.</p>
-    {pages.map(page => <div key={page.canvas.id} dir="auto">
-      {page.text.lines.map((line, index) => <button key={index} type="button"
-        onMouseEnter={() => highlight(line, page)} onMouseLeave={clear}
-        onFocus={() => highlight(line, page)} onBlur={clear}
-        onClick={() => highlight(line, page, true)}>{line.text || line.spans?.map(s => s.text).join('')}</button>)}
-    </div>)}
-  </div></details></>, panel);
+  return createPortal(<details className="sacda-text-panel">
+    <summary>Recognized text</summary>
+    <div className="sacda-text-panel__body">
+      <p className="sacda-transcript-note">Automatically recognized text may contain errors.</p>
+      {pages.map(page => <div key={page.canvas.id} dir="auto">
+        {page.text.lines.map((line, index) => <button key={index} type="button"
+          onMouseEnter={() => highlight(line, page)} onMouseLeave={clear}
+          onFocus={() => highlight(line, page)} onBlur={clear}
+          onClick={() => highlight(line, page, true)}>{line.text || line.spans?.map(s => s.text).join('')}</button>)}
+      </div>)}
+    </div>
+  </details>, panel);
 }
 const transcriptPlugin = {
   target: 'OpenSeadragonViewer', mode: 'add', component: Transcript,
@@ -61,6 +65,8 @@ Drupal.behaviors.sacdaImageViewer = {
         panel.setAttribute('aria-label', Drupal.t('Recognized text'));
         panel.hidden = true;
         wrapper.append(panel);
+        const sidebar = wrapper.parentElement.querySelector(':scope > .mirador-sidebar-toggle');
+        if (sidebar) wrapper.append(sidebar);
         const instance = Mirador.viewer(config, [...textOverlay, transcriptPlugin]);
         Drupal.IslandoraMirador ||= { instances: {} };
         Drupal.IslandoraMirador.instances[selector] = instance;

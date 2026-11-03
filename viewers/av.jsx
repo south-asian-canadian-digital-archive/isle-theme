@@ -3,10 +3,12 @@ import { createRoot } from 'react-dom/client';
 import { IIIFPlayer, MediaPlayer, Transcript } from '@samvera/ramp';
 const roots = new WeakMap();
 function Player({ mount, hasTranscript, ratio }) {
-  const [tab, setTab] = useState('media');
+  const [tab, setTab] = useState('timeline');
   const [open, setOpen] = useState(true);
-  const [timestamps, setTimestamps] = useState(true);
+  const [plainText, setPlainText] = useState('');
+  const [copied, setCopied] = useState(false);
   const ref = useRef();
+  const plainRef = useRef();
   useEffect(() => {
     const enhance = () => {
       [['input[data-testid="transcript-search-input"]', 'Search transcript'],
@@ -18,51 +20,76 @@ function Player({ mount, hasTranscript, ratio }) {
         const label = document.createElement('label'); label.className = 'sacda-control-label';
         label.htmlFor = control.id; label.textContent = title; control.before(label);
       });
-      ref.current?.querySelectorAll('.ramp--transcript_text').forEach(text => {
-      text.tabIndex = timestamps ? -1 : 0;
-      text.setAttribute('role', 'button');
-      });
+      const text = [...mount.querySelectorAll('.ramp--transcript_text')]
+        .map(line => line.textContent.trim()).filter(Boolean).join(' ');
+      setPlainText(previous => previous === text ? previous : text);
     };
     enhance();
     const observer = new MutationObserver(enhance);
     observer.observe(mount, { childList: true, subtree: true });
     return () => observer.disconnect();
-  }, [timestamps]);
+  }, [mount]);
+  useEffect(() => { setCopied(false); }, [plainText]);
+  useEffect(() => {
+    // Ramp measures its HUD on VideoJS's resize event, not on grid changes.
+    let stage; let previousWidth; let frame;
+    const resize = new ResizeObserver(entries => {
+      const width = entries[0].contentRect.width;
+      if (width === previousWidth) return;
+      previousWidth = width;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const player = mount.querySelector('.video-js')?.player;
+        if (player && !player.isDisposed()) {
+          player.trigger('resize'); player.trigger('playerresize');
+        }
+      });
+    });
+    const watch = () => {
+      const next = mount.querySelector('.sacda-av-stage');
+      if (!next || next === stage) return;
+      resize.disconnect(); stage = next; resize.observe(stage);
+    };
+    watch();
+    const observer = new MutationObserver(watch);
+    observer.observe(mount, { childList: true, subtree: true });
+    return () => { observer.disconnect(); resize.disconnect(); cancelAnimationFrame(frame); };
+  }, [mount]);
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(plainText); setCopied(true); }
+    catch { plainRef.current?.focus(); plainRef.current?.select(); setCopied(document.execCommand('copy')); }
+  };
   return <IIIFPlayer manifestUrl={mount.dataset.sacdaAv}>
-    <div ref={ref} className={`sacda-av ${timestamps ? '' : 'sacda-av--plain'}`}>
+    <div ref={ref} className={`sacda-av ${tab === 'plain' ? 'sacda-av--plain' : ''}`}>
       {hasTranscript && <div className="sacda-viewer-toolbar">
-        <div role="tablist" aria-label="Media views" onKeyDown={event => {
-          if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
-            event.preventDefault();
-            const next = event.key === 'Home' ? 'media' : event.key === 'End' ? 'text' : tab === 'media' ? 'text' : 'media';
-            setTab(next); ref.current.querySelector(`#${mount.id}-${next}-tab`).focus();
-          }
-        }}>
-          {[['media', 'Media'], ['text', 'Transcript']].map(([id, label]) => <button type="button" role="tab"
-            id={`${mount.id}-${id}-tab`} aria-selected={tab === id} aria-controls={`${mount.id}-view`}
-            tabIndex={tab === id ? 0 : -1} key={id} onClick={() => setTab(id)}>{label}</button>)}
-        </div>
-        {tab === 'media' && <button type="button" className="sacda-panel-toggle" aria-expanded={open}
-          aria-controls={`${mount.id}-text`} onClick={() => setOpen(!open)}>{open ? 'Hide transcript' : 'Show transcript'}</button>}
+        <button type="button" className="sacda-panel-toggle" aria-expanded={open}
+          aria-controls={`${mount.id}-text`} onClick={() => setOpen(!open)}>{open ? 'Hide transcript' : 'Show transcript'}</button>
       </div>}
-      <div id={`${mount.id}-view`} role={hasTranscript ? 'tabpanel' : undefined}
-        aria-labelledby={hasTranscript ? `${mount.id}-${tab}-tab` : undefined}
-        className={`sacda-av-layout ${tab === 'text' ? 'sacda-av-layout--text' : !open || !hasTranscript ? 'sacda-av-layout--media' : ''}`}>
-        <div className="sacda-av-stage" hidden={tab === 'text'} style={{ '--media-ratio': ratio }}><MediaPlayer enableFileDownload={false} /></div>
-        {hasTranscript && <section onClickCapture={event => {
-          if (!timestamps && event.target.closest('.ramp--transcript_text')) {
-            event.preventDefault(); event.stopPropagation();
-            event.target.closest('.ramp--transcript_item')?.querySelector('.ramp--transcript_time')?.click();
-          }
-        }} onKeyDownCapture={event => {
-          if (!timestamps && ['Enter', ' '].includes(event.key) && event.target.matches('.ramp--transcript_text')) {
-            event.preventDefault(); event.stopPropagation();
-            event.target.closest('.ramp--transcript_item')?.querySelector('.ramp--transcript_time')?.click();
-          }
-        }} className="sacda-av-transcript" id={`${mount.id}-text`} hidden={tab === 'media' && !open}>
-          <div className="sacda-transcript-options"><label><input type="checkbox" checked={timestamps}
-            onChange={event => setTimestamps(event.target.checked)} /> Show timestamps</label></div>
-          <Transcript playerID={mount.id} manifestUrl={mount.dataset.sacdaAv} />
+      <div className={`sacda-av-layout ${!open || !hasTranscript ? 'sacda-av-layout--media' : ''}`}>
+        <div className="sacda-av-stage" style={{ '--media-ratio': ratio }}><MediaPlayer enableFileDownload={false} /></div>
+        {hasTranscript && <section className="sacda-av-transcript" id={`${mount.id}-text`} hidden={!open}>
+          <div className="sacda-viewer-toolbar">
+            <div role="tablist" aria-label="Transcript format" onKeyDown={event => {
+              if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+                event.preventDefault();
+                const next = event.key === 'Home' ? 'timeline' : event.key === 'End' ? 'plain' : tab === 'timeline' ? 'plain' : 'timeline';
+                setTab(next); ref.current.querySelector(`#${mount.id}-${next}-tab`).focus();
+              }
+            }}>
+              {[['timeline', 'Timeline'], ['plain', 'Plain text']].map(([id, label]) => <button type="button" role="tab"
+                id={`${mount.id}-${id}-tab`} aria-selected={tab === id} aria-controls={`${mount.id}-${id}-panel`}
+                tabIndex={tab === id ? 0 : -1} key={id} onClick={() => setTab(id)}>{label}</button>)}
+            </div>
+          </div>
+          <div id={`${mount.id}-timeline-panel`} role={tab === 'timeline' ? 'tabpanel' : undefined}
+            aria-labelledby={tab === 'timeline' ? `${mount.id}-timeline-tab` : undefined}>
+            <Transcript playerID={mount.id} manifestUrl={mount.dataset.sacdaAv} />
+          </div>
+          <div id={`${mount.id}-plain-panel`} role="tabpanel" aria-labelledby={`${mount.id}-plain-tab`} hidden={tab !== 'plain'} className="sacda-text-panel__body">
+            <button type="button" className="btn btn-outline" disabled={!plainText} onClick={copy}>Copy text</button>
+            <span className="text-sm" role="status">{copied ? 'Copied' : ''}</span>
+            <textarea ref={plainRef} aria-label="Plain text transcript" className="form-textarea w-full" rows="12" readOnly value={plainText} />
+          </div>
         </section>}
       </div>
     </div>

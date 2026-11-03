@@ -159,7 +159,7 @@
 .sacda-viewer-toolbar [aria-selected="true"] { border-bottom-color: var(--primary); font-weight: 700; }
 .sacda-panel-toggle { font-size: .875rem; text-decoration: underline; }
 .sacda-av-layout { gap: 0; grid-template-columns: minmax(0, 2fr) minmax(20rem, 1fr); align-items: start; }
-.sacda-av-layout--text, .sacda-av-layout--media { grid-template-columns: minmax(0, 1fr); }
+.sacda-av-layout--media { grid-template-columns: minmax(0, 1fr); }
 .sacda-av-stage { min-width: 0; background: #000; }
 [data-sacda-av] [hidden] { display: none !important; }
 /* VideoJS's fluid 16:9 padding must not override square/portrait manifests. */
@@ -167,8 +167,6 @@
 [data-sacda-av] .sacda-av-stage .video-js.vjs-audio-only-mode { aspect-ratio: auto; min-height: 5rem; }
 [data-sacda-av] .video-js video.vjs-tech { object-fit: contain; width: 100%; height: 100%; }
 .sacda-av-transcript { min-width: 0; background: var(--background); border: 1px solid var(--muted); }
-.sacda-transcript-options { padding: .75rem 1rem; border-bottom: 1px solid var(--muted); font-size: .875rem; }
-.sacda-transcript-options label { display: flex; gap: .5rem; align-items: center; }
 [data-sacda-av] .ramp--transcript_nav { margin: 0; padding: 0; width: 100%; font: inherit; }
 [data-sacda-av] .ramp--transcript_menu { padding: 1rem; margin: 0; border: 0; border-bottom: 1px solid var(--muted); background: var(--background); border-radius: 0; display: flex; flex-direction: column; gap: .75rem; }
 [data-sacda-av] .ramp--transcript_search, [data-sacda-av] .ramp--transcript_selector { width: 100%; margin: 0; display: flex; gap: .5rem; }
@@ -183,8 +181,6 @@
 [data-sacda-av] .ramp--transcript_item { padding: .5rem; gap: .75rem; margin: 0; }
 [data-sacda-av] .ramp--transcript_text { font: inherit; margin: 0; line-height: 1.65; }
 [data-sacda-av] .ramp--transcript_time { font: inherit; font-size: .8rem; min-width: 5.5rem; }
-[data-sacda-av] .sacda-av--plain .ramp--transcript_time { display: none; }
-[data-sacda-av] .sacda-av--plain .ramp--transcript_item { display: block; }
 [data-sacda-av] :is(button, input, select, [tabindex="0"]):focus-visible,
 .sacda-text-panel summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 @media (max-width: 700px) {
@@ -201,7 +197,6 @@
     .sacda-pdf-reader { flex-direction: column; }
     .sacda-pdf-document { min-height: 18rem; }
 }
-[data-sacda-av] .sacda-transcript-options label,
 [data-sacda-av] .ramp--transcript_auto_scroll_check label { font: inherit; font-size: .875rem; }
 [data-sacda-av] input[type="checkbox"] { accent-color: #414042; width: 1rem; height: 1rem; }
 [data-sacda-av] .ramp--transcript_cue-texts { padding: 0; margin: 0; }
@@ -221,3 +216,10 @@
 .node--type-islandora-object { overflow-wrap: anywhere; }
 /* Keep offscreen VideoJS menu/track contents inside the player region. */
 [data-sacda-av] { overflow-x: clip; }
+
+/* Text formats live inside the transcript panel; media stays mounted and visible. */
+[data-sacda-av] .sacda-av--plain .transcript_content,
+[data-sacda-av] .sacda-av--plain .ramp--transcript_search,
+[data-sacda-av] .sacda-av--plain .ramp--transcript_auto_scroll_check { display: none; }
+[data-sacda-av] textarea[aria-label="Plain text transcript"] { display: block; resize: vertical; margin-top: 1rem; }
+.sacda-reader > .sacda-image-transcript[hidden] { display: none; }
