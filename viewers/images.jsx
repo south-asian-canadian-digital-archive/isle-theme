@@ -30,15 +30,15 @@ function Transcript({ viewer, canvases, texts, windowId }) {
     if (seek) viewer.viewport.fitBounds(rect, false);
   };
   return createPortal(<>
-    <h2>Transcript</h2>
-    <p className="sacda-transcript-note">Machine transcription may contain errors.</p>
+    <details className="sacda-text-panel" open><summary>Recognized text <span aria-hidden="true">⌄</span></summary><div className="sacda-text-panel__body">
+    <p className="sacda-transcript-note">Automatically recognized text may contain errors.</p>
     {pages.map(page => <div key={page.canvas.id} dir="auto">
       {page.text.lines.map((line, index) => <button key={index} type="button"
         onMouseEnter={() => highlight(line, page)} onMouseLeave={clear}
         onFocus={() => highlight(line, page)} onBlur={clear}
         onClick={() => highlight(line, page, true)}>{line.text || line.spans?.map(s => s.text).join('')}</button>)}
     </div>)}
-  </>, panel);
+  </div></details></>, panel);
 }
 const transcriptPlugin = {
   target: 'OpenSeadragonViewer', mode: 'add', component: Transcript,
@@ -58,7 +58,7 @@ Drupal.behaviors.sacdaImageViewer = {
         const panel = document.createElement('aside');
         panel.dataset.imageTranscript = '';
         panel.className = 'sacda-image-transcript';
-        panel.setAttribute('aria-label', Drupal.t('Transcript'));
+        panel.setAttribute('aria-label', Drupal.t('Recognized text'));
         panel.hidden = true;
         wrapper.append(panel);
         const instance = Mirador.viewer(config, [...textOverlay, transcriptPlugin]);
