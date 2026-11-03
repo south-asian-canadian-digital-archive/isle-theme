@@ -80,8 +80,8 @@ printHeader();
 console.log(padLine("Status: Scanning files..."));
 console.log(line());
 
-const cssFiles = globSync("dist/**/*.css", { cwd: rootDir });
-const jsFiles = globSync("dist/**/*.js", { cwd: rootDir });
+const cssFiles = globSync("dist/*.css", { cwd: rootDir });
+const jsFiles = globSync("dist/*.js", { cwd: rootDir });
 
 printSection("JS Files", jsFiles);
 printSection("CSS Files", cssFiles);
@@ -105,6 +105,25 @@ if (cssFiles.length > 0) {
 }
 
 const librariesPath = resolve(rootDir, "sacda.libraries.yml");
+content += `
+# Load the large viewers only on pages with a matching media block.
+iiif-images:
+  js:
+    dist/viewers/images.js: { minified: true }
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+av:
+  js:
+    dist/viewers/av.js: { minified: true }
+  css:
+    component:
+      dist/viewers/ramp.css: {}
+  dependencies:
+    - core/drupal
+    - core/once
+`;
 writeFileSync(librariesPath, content);
 
 printFooter(jsFiles.length, cssFiles.length);

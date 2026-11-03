@@ -648,6 +648,15 @@ function sacda_preprocess_mirador(array &$variables): void {
     return;
   }
   $viewer = &$variables['#attached']['drupalSettings']['mirador']['viewers'][$key];
+  // Bundle Mirador and textoverlay together so React and plugin state are shared.
+  $variables['#attached']['library'] = array_values(array_diff(
+    $variables['#attached']['library'], ['islandora_mirador/viewer']
+  ));
+  $variables['#attached']['library'][] = 'sacda/iiif-images';
+  $viewer['window']['textOverlay'] = [
+    'enabled' => TRUE, 'selectable' => TRUE, 'visible' => FALSE,
+    'useAutoColors' => FALSE,
+  ];
 
   // Drop the left workspace control panel (add-window / workspace switcher) —
   // this site never shows more than one object at a time.
