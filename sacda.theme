@@ -694,3 +694,19 @@ function sacda_preprocess_mirador(array &$variables): void {
     $viewer['windows'][$i]['thumbnailNavigationPosition'] = 'far-right';
   }
 }
+
+/**
+ * Implements hook_preprocess_field().
+ *
+ * field_identifier is one field; Collection-level archival components label
+ * it collectionIdentifier. Everything else keeps its bundle's field label.
+ */
+function sacda_preprocess_field(array &$variables): void {
+  if ($variables['field_name'] !== 'field_identifier' || $variables['entity_type'] !== 'node') {
+    return;
+  }
+  $node = $variables['element']['#object'];
+  if ($node->hasField('field_archival_level') && $node->get('field_archival_level')->entity?->label() === 'Collection') {
+    $variables['label'] = 'collectionIdentifier';
+  }
+}
