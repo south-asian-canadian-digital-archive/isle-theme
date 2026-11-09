@@ -7,6 +7,12 @@
  * the input, list and no-result element by them.
  */
 #}
+{#
+  Nothing at all when no value has results: with min_count 0 the list is never
+  empty, and sacda_preprocess_page() shows the filters sidebar whenever any
+  block prints an input.
+#}
+{% if facet_with_results is not same as(0) %}
 <div class="facets-widget-{{ facet.widget.type }}{{ facet_fits ? ' facets-fits' }}{{ facet_with_results is same as(0) ? ' facets-no-results' }}">
   <input type="search" placeholder="{{ 'Filter…'|t }}" aria-label="{{ 'Filter values'|t }}" class="facets-widget-searchbox facets-filter form-text mb-2 w-full" data-type="checkbox" />
   {%- set attributes = attributes.addClass('item-list__' ~ facet.widget.type, 'facets-widget-searchbox-list') %}
@@ -23,3 +29,4 @@
   {%- endif %}
   <p class="facets-widget-searchbox-no-result facets-filter-empty text-sm hide">{{ 'No matches.'|t }}</p>
 </div>
+{% endif %}
