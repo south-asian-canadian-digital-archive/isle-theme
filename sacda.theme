@@ -723,7 +723,24 @@ function sacda_preprocess_facets_item_list__searchbox_checkbox(array &$variables
   if (!$facet) {
     return;
   }
-  $with_results = count(array_filter($facet->getResults(), fn($r) => $r->getCount() > 0));
+  // Values at every level, as soft-limit.js counts them; selected values
+  // count even at 0, so a ticked filter stays visible and can be unticked.
+  $count = function (array $results) use (&$count): int {
+    $n = 0;
+    foreach ($results as $result) {
+      $n += ($result->getCount() > 0 || $result->isActive() ? 1 : 0) + $count($result->getChildren());
+    }
+    return $n;
+  };
+  $with_results = $count($facet->getResults());
+  // Values outside the results last, keeping the configured order otherwise:
+  // soft-limit.js hides by position and counts the (hidden) 0-count values,
+  // so a value with results sorted after them would be unreachable.
+  $zero = fn($item) => (int) ($item['value']['#title']['#count'] ?? 1) === 0 && empty($item['value']['#title']['#is_active']);
+  $variables['items'] = array_merge(
+    array_values(array_filter($variables['items'], fn($i) => !$zero($i))),
+    array_values(array_filter($variables['items'], $zero)),
+  );
   $limit = (int) ($facet->getWidget()['config']['soft_limit'] ?? 0);
   $variables['facet_with_results'] = $with_results;
   $variables['facet_fits'] = !$limit || $with_results <= $limit;

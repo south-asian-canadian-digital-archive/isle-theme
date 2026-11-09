@@ -1,3 +1,9 @@
+{#
+  No block at all when the facet renders nothing (e.g. a searchbox facet with
+  no values in the results), so an empty facet leaves no heading behind.
+#}
+{% set body = content|render %}
+{% if body|striptags|trim is not empty or '<input' in body %}
 <details{{ attributes.addClass('contextual-region', 'w-full', 'border-t', 'border-[#e5e5e5]', 'first:border-t-0', 'px-4', 'py-4', 'group') }} open>
   {{ title_suffix }}
 
@@ -9,6 +15,7 @@
   </summary>
 
   <div class="**:list-none pt-4">
-    {{ content }}
+    {{ body }}
   </div>
 </details>
+{% endif %}

@@ -13,7 +13,7 @@
   block prints an input.
 #}
 {% if facet_with_results is not same as(0) %}
-<div class="facets-widget-{{ facet.widget.type }}{{ facet_fits ? ' facets-fits' }}{{ facet_with_results is same as(0) ? ' facets-no-results' }}">
+<div class="facets-widget-{{ facet.widget.type }}{{ facet_fits ? ' facets-fits' }}">
   <input type="search" placeholder="{{ 'Filter…'|t }}" aria-label="{{ 'Filter values'|t }}" class="facets-widget-searchbox facets-filter form-text mb-2 w-full" data-type="checkbox" />
   {%- set attributes = attributes.addClass('item-list__' ~ facet.widget.type, 'facets-widget-searchbox-list') %}
   {% if items or empty %}

@@ -780,10 +780,7 @@ div.views-element-container > div.view-list {
 }
 
 /* Until the box has text, "Show more" only for facets whose values with
-   results exceed the soft limit, and no block for facets with none. */
+   results exceed the soft limit. */
 .facets-fits:has(> .facets-widget-searchbox:placeholder-shown) > .facets-soft-limit-link {
     display: none !important;
-}
-.result-facets details:has(.facets-no-results) {
-    display: none;
 }
