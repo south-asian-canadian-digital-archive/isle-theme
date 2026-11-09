@@ -3,7 +3,6 @@ global:
   js:
     dist/advanced-search.js: {}
     dist/carousel.js: {}
-    dist/facet-filter.js: {}
     dist/filters-panel.js: {}
     dist/frontpage.js: {}
     dist/header.js: {}

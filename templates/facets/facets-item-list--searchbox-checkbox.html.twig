@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * facets_searchbox_widget's searchable checkbox list, with the classes fast
+ * search's CheckboxFacet.svelte uses (facets-filter, facets-filter-empty) so
+ * both render the same. The module's own classes stay: its searchbox.js finds
+ * the input, list and no-result element by them.
+ */
+#}
+<div class="facets-widget-{{ facet.widget.type }}{{ facet_fits ? ' facets-fits' }}{{ facet_with_results is same as(0) ? ' facets-no-results' }}">
+  <input type="search" placeholder="{{ 'Filter…'|t }}" aria-label="{{ 'Filter values'|t }}" class="facets-widget-searchbox facets-filter form-text mb-2 w-full" data-type="checkbox" />
+  {%- set attributes = attributes.addClass('item-list__' ~ facet.widget.type, 'facets-widget-searchbox-list') %}
+  {% if items or empty %}
+    {%- if items -%}
+      <{{ list_type }}{{ attributes }}>
+        {%- for item in items -%}
+          <li{{ item.attributes }}>{{ item.value }}</li>
+        {%- endfor -%}
+      </{{ list_type }}>
+    {%- else -%}
+      {{- empty -}}
+    {%- endif -%}
+  {%- endif %}
+  <p class="facets-widget-searchbox-no-result facets-filter-empty text-sm hide">{{ 'No matches.'|t }}</p>
+</div>

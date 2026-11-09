@@ -1,0 +1,15 @@
+{#
+/**
+ * @file
+ * Facet value. Zero-count values (facets with min_count 0, so the searchbox can
+ * find every value) get facet-item__count--zero; main.css hides them until the
+ * filter box has text.
+ */
+#}
+{% if is_active %}
+  <span class="facet-item__status js-facet-deactivate">(-)</span>
+{% endif %}
+<span class="facet-item__value">{{ value }}</span>
+{% if show_count %}
+  <span class="facet-item__count{{ count == 0 ? ' facet-item__count--zero' }}">({{ count }})</span>
+{% endif %}

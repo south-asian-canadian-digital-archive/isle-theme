@@ -771,3 +771,19 @@ div.views-element-container > div.view-list {
     padding: .5rem .875rem;
     margin-bottom: 1rem;
 }
+
+/* Searchbox facets with min_count 0: values outside the current results show
+   only while filtering, as in fast search. !important beats the inline display
+   searchbox.js and soft-limit.js set. */
+.facets-widget-searchbox:placeholder-shown ~ ul li.facet-item:has(> label .facet-item__count--zero, > a .facet-item__count--zero) {
+    display: none !important;
+}
+
+/* Until the box has text, "Show more" only for facets whose values with
+   results exceed the soft limit, and no block for facets with none. */
+.facets-fits:has(> .facets-widget-searchbox:placeholder-shown) > .facets-soft-limit-link {
+    display: none !important;
+}
+.result-facets details:has(.facets-no-results) {
+    display: none;
+}

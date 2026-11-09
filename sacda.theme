@@ -709,3 +709,22 @@ function sacda_preprocess_field(array &$variables): void {
     $variables['label'] = 'collectionIdentifier';
   }
 }
+
+/**
+ * Implements hook_preprocess_HOOK() for facets_item_list__searchbox_checkbox.
+ *
+ * Facets with min_count 0 render every value, so the searchbox can find any
+ * of them, and main.css hides the 0-count ones until the box has text. These
+ * flags let it also hide a "Show more" that would only reveal hidden values,
+ * and the whole block when nothing has results (as fast search does).
+ */
+function sacda_preprocess_facets_item_list__searchbox_checkbox(array &$variables): void {
+  $facet = $variables['facet'] ?? NULL;
+  if (!$facet) {
+    return;
+  }
+  $with_results = count(array_filter($facet->getResults(), fn($r) => $r->getCount() > 0));
+  $limit = (int) ($facet->getWidget()['config']['soft_limit'] ?? 0);
+  $variables['facet_with_results'] = $with_results;
+  $variables['facet_fits'] = !$limit || $with_results <= $limit;
+}
