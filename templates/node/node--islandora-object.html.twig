@@ -29,6 +29,9 @@
 				{% if content.group_backlinks %}
 					{{ content.group_backlinks }}
 				{% endif %}
+				{% if content.group_location %}
+					{{ content.group_location }}
+				{% endif %}
                 {% if item_downloads %}
                     <details class="form-wrapper sacda-downloads" open>
                         <summary>{{ 'Downloads'|t }}</summary>
@@ -42,9 +45,6 @@
                         {% endfor %}
                     </details>
                 {% endif %}
-				{% if content.group_location %}
-					{{ content.group_location }}
-				{% endif %}
 
 			</div>
 		</aside>
