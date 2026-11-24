@@ -78,9 +78,13 @@ function sacda_theme_suggestions_menu_alter(array &$suggestions, array $variable
  * Implements hook_theme_suggestions_HOOK_alter() for node templates.
  */
 function sacda_theme_suggestions_node_alter(array &$suggestions, array $variables): void {
-  // Collections are archival components at the Collection level.
+  // Collections are archival components at the Collection level. Only the
+  // full page uses the collection template: Drupal ranks this suggestion
+  // above the Views ones, so in listings (taxonomy term pages) it would
+  // replace the result card with the whole page layout.
   $node = $variables['elements']['#node'] ?? NULL;
-  if ($node && $node->bundle() === 'archival_component'
+  $view_mode = $variables['elements']['#view_mode'] ?? 'full';
+  if ($node && $view_mode === 'full' && $node->bundle() === 'archival_component'
     && $node->get('field_archival_level')->entity?->label() === 'Collection') {
     $suggestions[] = 'node__collection';
   }
