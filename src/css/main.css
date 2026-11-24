@@ -357,7 +357,7 @@
     .result-facets .filters-toggle::after {
         @apply font-black ml-auto text-base leading-none text-muted-foreground transition-transform duration-[250ms] ease-in-out;
         font-family: "Font Awesome 6 Free";
-        content: "\f078";
+        content: "\f077";
     }
 
     .result-facets.filters--collapsed .filters-toggle::after {
